@@ -1,21 +1,12 @@
 package models
 
 type Question struct {
-	ID     int
-	TestID Test
-	Type   string
-	Text   string
-	Points int
+	ID     uint   `gorm:"primaryKey;autoIncrement"`
+	TestID string `gorm:"type:uuid;not null"`
+	Test   Test   `gorm:"foreignKey:TestID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+
+	// Контент
+	Text   string `gorm:"type:text;not null"`
+	Type   string `gorm:"type:varchar(50);not null;default:'multiple'"` // Например
+	Points int    `gorm:"not null;default:0"`
 }
-
-// id (UUID, PK)
-
-// test_id (FK -> Tests.id)
-
-// type (Enum) — Тип: single (один), multiple (несколько), text (поле).
-
-// text (Text) — Текст вопроса.
-
-// points (Int) — Вес вопроса (сколько баллов за правильный ответ).
-
-// order_num (Int) — Порядок отображения.

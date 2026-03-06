@@ -1,10 +1,11 @@
 package models
 
 type Admin struct {
-	ID       int
-	Email    string
-	Passwrdo string
-	FullName string
+	ID       uint   `gorm:"primaryKey;autoIncrement"`
+	FullName string `gorm:"type:varchar(255);not null"`
+	Email    string `gorm:"type:varchar(255);unique;not null;index"`
+	Password string `gorm:"not null"`
+	IsRoot   bool   `gorm:"not null;default:false"`
 }
 
 // id (UUID/Int, PK)

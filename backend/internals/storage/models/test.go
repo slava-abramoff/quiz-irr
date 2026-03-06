@@ -3,15 +3,19 @@ package models
 import "time"
 
 type Test struct {
-	ID        int
-	AuthorID  Admin
-	Title     string
-	Desc      string
-	IsActive  bool
-	Start     time.Time
-	End       time.Time
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID       string `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+	AuthorID uint   `gorm:"not null"`            // Внешний ключ (FK)
+	Author   Admin  `gorm:"foreignKey:AuthorID"` // Сама структура для связки
+
+	// Ключевые данные теста
+	Title    string `gorm:"type:varchar(255);not null"`
+	Desc     string `gorm:"type:text"`
+	IsActive bool   `gorm:"not null;default:false"`
+
+	// Работа со временем
+	StartAt   time.Time `gorm:"not null"`
+	EndAt     time.Time `gorm:"not null"`
+	CreatedAt time.Time `gorm:"autoCreateTime"`
 }
 
 // id (UUID, PK)

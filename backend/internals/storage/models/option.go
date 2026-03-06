@@ -1,10 +1,13 @@
 package models
 
 type Option struct {
-	ID         int
-	QuestionID Question
-	Text       string
-	IsCorrect  bool
+	ID         uint     `gorm:"primaryKey;autoIncrement"`
+	QuestionID uint     `gorm:"not null"`
+	Question   Question `gorm:"foreignKey:QuestionID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+
+	// Контент и логика
+	Text      string `gorm:"type:text;not null"`
+	IsCorrect bool   `gorm:"not null;default:false"`
 }
 
 // id (UUID, PK)

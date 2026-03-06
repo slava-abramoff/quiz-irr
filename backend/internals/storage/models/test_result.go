@@ -1,22 +1,16 @@
 package models
 
 type TestResult struct {
-	TestID      Test
-	FullName    string
-	Email       string
-	Org         string
-	TotalScore  string
-	CompletedAt string
+	ID     uint   `gorm:"primaryKey;autoIncrement"`
+	TestID string `gorm:"type:uuid;not null;index"`
+	Test   Test   `gorm:"foreignKey:TestID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+
+	// Данные участника
+	FullName string `gorm:"type:varchar(255);not null"`
+	Email    string `gorm:"type:varchar(255);not null"`
+	Org      string `gorm:"type:varchar(255)"`
+
+	// Метрики результата
+	Duration   int `gorm:"not null"`
+	TotalScore int `gorm:"not null;index"`
 }
-
-// test_id (FK -> Tests.id)
-
-// full_name (String) — ФИО.
-
-// email (String) — Почта.
-
-// organization (String) — Учреждение.
-
-// total_score (Int) — Итоговый балл (считается автоматически в конце).
-
-// completed_at (Timestamp)
