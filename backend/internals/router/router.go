@@ -12,8 +12,8 @@ func NewRouter(
 	router := httprouter.New()
 
 	router.POST("/api/users", u.Create)
-	router.PATCH("/api/users", u.Update)
-	router.DELETE("/api/users", u.Delete)
+	router.PATCH("/api/users/:id", u.Update)
+	router.DELETE("/api/users/:id", u.Delete)
 
 	return router
 }

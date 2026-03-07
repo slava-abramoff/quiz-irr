@@ -11,6 +11,7 @@ type TestResult struct {
 	Org      string `gorm:"type:varchar(255)"`
 
 	// Метрики результата
-	Duration   int `gorm:"not null"`
-	TotalScore int `gorm:"not null;index"`
+	Duration   uint `gorm:"not null"`
+	IsOnTime   bool `gorm:"not null;default:false"`
+	TotalScore uint `gorm:"not null;index"`
 }

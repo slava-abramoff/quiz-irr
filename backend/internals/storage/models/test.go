@@ -13,9 +13,9 @@ type Test struct {
 	IsActive bool   `gorm:"not null;default:false"`
 
 	// Работа со временем
-	StartAt   time.Time `gorm:"not null"`
-	EndAt     time.Time `gorm:"not null"`
-	CreatedAt time.Time `gorm:"autoCreateTime"`
+	StartAt   *time.Time `gorm:"type:timestamptz"`
+	EndAt     *time.Time `gorm:"type:timestamptz"`
+	CreatedAt time.Time  `gorm:"autoCreateTime"`
 }
 
 // id (UUID, PK)
