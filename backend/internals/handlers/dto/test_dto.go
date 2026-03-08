@@ -6,11 +6,11 @@ type CreateTestRequest struct {
 }
 
 type UpdateTestRequest struct {
-	Title    string `json:"title"`
-	Desc     string `json:"desc"`
-	IsActive bool   `json:"is_active"`
-	StartAt  string `json:"start_at"`
-	EndAt    string `json:"end_at"`
+	Title    *string `json:"title"`
+	Desc     *string `json:"desc"`
+	IsActive *bool   `json:"is_active"`
+	StartAt  *string `json:"start_at"`
+	EndAt    *string `json:"end_at"`
 }
 
 type TestAdminResponse struct {
@@ -20,5 +20,6 @@ type TestAdminResponse struct {
 	IsActive  bool               `json:"is_active"`
 	StartAt   string             `json:"start_at"`
 	EndAt     string             `json:"end_at"`
+	Author    string             `json:"author"`
 	Questions []QuestionResponse `json:"questions"`
 }

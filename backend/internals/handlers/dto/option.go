@@ -1,8 +1,13 @@
 package dto
 
-type OptionRequest struct {
+type CreateOptionRequest struct {
 	Text      string `json:"text"`
 	IsCorrect bool   `json:"is_correct"`
+}
+
+type UpdateOptionRequest struct {
+	Text      *string `json:"text"`
+	IsCorrect *bool   `json:"is_correct"`
 }
 
 type OptionResponse struct {

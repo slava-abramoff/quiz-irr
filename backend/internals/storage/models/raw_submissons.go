@@ -3,13 +3,14 @@ package models
 import (
 	"time"
 
+	"github.com/google/uuid"
 	"gorm.io/datatypes"
 )
 
 type RawSubmission struct {
-	ID     string `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
-	TestID string `gorm:"type:uuid;not null;index"`
-	Test   Test   `gorm:"foreignKey:TestID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	ID     uuid.UUID `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+	TestID string    `gorm:"type:uuid;not null;index"`
+	Test   Test      `gorm:"foreignKey:TestID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 
 	FullName string `gorm:"type:varchar(255);not null"`
 	Email    string `gorm:"type:varchar(255);not null"`

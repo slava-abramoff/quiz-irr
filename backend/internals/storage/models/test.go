@@ -1,11 +1,15 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Test struct {
-	ID       string `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
-	AuthorID uint   `gorm:"not null"`            // Внешний ключ (FK)
-	Author   Admin  `gorm:"foreignKey:AuthorID"` // Сама структура для связки
+	ID       uuid.UUID `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+	AuthorID uint      `gorm:"not null"`            // Внешний ключ (FK)
+	Author   Admin     `gorm:"foreignKey:AuthorID"` // Сама структура для связки
 
 	// Ключевые данные теста
 	Title    string `gorm:"type:varchar(255);not null"`

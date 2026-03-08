@@ -5,7 +5,7 @@ type SendUserAnswersRequest struct {
 }
 
 type Answer struct {
-	ID       uint   `json:"answer_id"`
-	OptionID uint   `json:"option_id"`
-	Text     string `json:"text_option"`
+	ID        uint   `json:"answer_id"`
+	OptionIDs []uint `json:"option_ids"`
+	Text      string `json:"text_option"`
 }

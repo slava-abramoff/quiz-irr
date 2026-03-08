@@ -1,65 +1,280 @@
 package usecases
 
-type testsCases struct{}
+import (
+	"context"
+	"quiz-irr/internals/handlers/dto"
+	"quiz-irr/internals/storage/models"
 
-func NewTestsCases() *testsCases {
-	return &testsCases{}
+	"github.com/google/uuid"
+)
+
+type OptionServiceProvider interface {
+	Create(ctx context.Context, questionId uint, data dto.CreateOptionRequest) (*models.Option, error)
+	Update(ctx context.Context, id uint, data dto.UpdateOptionRequest) (*models.Option, error)
+	GetByQuestionID(ctx context.Context, questionId uint) ([]models.Option, error)
+	Delete(ctx context.Context, id uint) (*models.Option, error)
 }
 
-// Работа админа с тестом
-func (t *testsCases) NewTest()
+type QuestionServiceProvider interface {
+	Create(ctx context.Context, testId uuid.UUID, data dto.CreateQuestionRequest) (*models.Question, error)
+	Update(ctx context.Context, id uint, data dto.UpdateQuestionRequest) (*models.Question, error)
+	GetByTestID(ctx context.Context, testId uuid.UUID) ([]models.Question, error)
+	Delete(ctx context.Context, id uint) (*models.Question, error)
+}
 
-func (t *testsCases) GetTestPreview()
+type TestServiceProvider interface {
+	Create(ctx context.Context, authorId uint, data dto.CreateTestRequest) (*models.Test, error)
+	GetByID(ctx context.Context, id uuid.UUID) (*models.Test, error)
+	Update(ctx context.Context, data dto.UpdateTestRequest) (*models.Test, error)
+	Delete(ctx context.Context, id uuid.UUID) (*models.Test, error)
+}
+
+type testsCases struct {
+	testService     TestServiceProvider
+	optionService   OptionServiceProvider
+	questionService QuestionServiceProvider
+}
+
+func NewTestsCases(
+	t TestServiceProvider,
+	o OptionServiceProvider,
+	q QuestionServiceProvider,
+) *testsCases {
+	return &testsCases{
+		testService:     t,
+		questionService: q,
+		optionService:   o,
+	}
+}
+
+// NewTest создает новый тест в системе
+func (t *testsCases) NewTest(
+	ctx context.Context,
+	authorId uint,
+	data dto.CreateTestRequest,
+) (*dto.TestAdminResponse, error) {
+	test, err := t.testService.Create(ctx, authorId, data)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.TestAdminResponse{
+		ID:       test.ID.String(),
+		Title:    test.Title,
+		Desc:     test.Desc,
+		IsActive: test.IsActive,
+		StartAt:  test.StartAt.Format("2006-01-02 15:04:05"),
+		EndAt:    test.EndAt.Format("2006-01-02 15:04:05"),
+		Author:   test.Author.FullName,
+	}, nil
+}
+
+// GetTestPreview выводит информацию по тесту, не включая вопросов и ответов
+func (t *testsCases) GetTestPreview(
+	ctx context.Context,
+	testId uuid.UUID,
+) (*dto.TestAdminResponse, error) {
+	test, err := t.testService.GetByID(ctx, testId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.TestAdminResponse{
+		ID:       test.ID.String(),
+		Title:    test.Title,
+		Desc:     test.Desc,
+		IsActive: test.IsActive,
+		StartAt:  test.StartAt.Format("2006-01-02 15:04:05"),
+		EndAt:    test.EndAt.Format("2006-01-02 15:04:05"),
+		Author:   test.Author.FullName,
+	}, nil
+}
 
 func (t *testsCases) FindManyTests()
 
-func (t *testsCases) GetTestFullData()
+// GetTestFullData выводит информацию по тесту, включая вопросов и ответов
+func (t *testsCases) GetTestFullData(
+	ctx context.Context,
+	testId uuid.UUID,
+) (*dto.TestAdminResponse, error) {
+	var testData dto.TestAdminResponse
 
-func (t *testsCases) UpdateTest()
+	test, err := t.testService.GetByID(ctx, testId)
+	if err != nil {
+		return nil, err
+	}
 
-func (t *testsCases) ActivateTest()
+	testData = dto.TestAdminResponse{
+		ID:       test.ID.String(),
+		Title:    test.Title,
+		Desc:     test.Desc,
+		IsActive: test.IsActive,
+		StartAt:  test.StartAt.Format("2006-01-02 15:04:05"),
+		EndAt:    test.EndAt.Format("2006-01-02 15:04:05"),
+		Author:   test.Author.FullName,
+	}
 
-func (t *testsCases) DeleteTest()
+	questions, err := t.questionService.GetByTestID(ctx, test.ID)
+	if err != nil {
+		return nil, err
+	}
 
-// Работа админа с вопросами и ответами
-func (t *testsCases) AddQuestion()
+	questionDtos := make([]dto.QuestionResponse, 0, 75)
 
-func (t *testsCases) EditQuestion()
+	for _, q := range questions {
+		optionDtos := make([]dto.OptionResponse, 0, 10)
 
-func (t *testsCases) DeleteQuestion()
+		questionDto := dto.QuestionResponse{
+			ID:     q.ID,
+			Text:   q.Text,
+			Type:   q.Type,
+			Points: q.Points,
+		}
 
-func (t *testsCases) AddOption()
+		options, err := t.optionService.GetByQuestionID(ctx, q.ID)
+		if err != nil {
+			return nil, err
+		}
 
-func (t *testsCases) EditOption()
+		for _, o := range options {
+			optionDto := dto.OptionResponse{
+				ID:        o.ID,
+				Text:      o.Text,
+				IsCorrect: o.IsCorrect,
+			}
 
-func (t *testsCases) DeleteOption()
+			optionDtos = append(optionDtos, optionDto)
+		}
 
-// Работа пользователя с тестом
-func (t *testsCases) GetTestInfo()
+		questionDto.Options = optionDtos
+		questionDtos = append(questionDtos, questionDto)
+	}
 
-func (t *testsCases) StartTest()
+	testData.Questions = questionDtos
+	return &testData, nil
+}
 
-func (t *testsCases) SaveAnswers()
+// UpdateTest обновляет некоторые поля теста
+func (t *testsCases) UpdateTest(
+	ctx context.Context,
+	data dto.UpdateTestRequest,
+) (*dto.TestAdminResponse, error) {
+	test, err := t.testService.Update(ctx, data)
+	if err != nil {
+		return nil, nil
+	}
 
-// Работа с сырыми данными
-func (t *testsCases) FindRawResults()
+	return &dto.TestAdminResponse{
+		ID:       test.ID.String(),
+		Title:    test.Title,
+		Desc:     test.Desc,
+		IsActive: test.IsActive,
+		StartAt:  test.StartAt.Format("2006-01-02 15:04:05"),
+		EndAt:    test.EndAt.Format("2006-01-02 15:04:05"),
+		Author:   test.Author.FullName,
+	}, nil
+}
 
-func (t *testsCases) AnalyzeResults()
+// DeleteTest удаляет конкретный тест
+func (t *testsCases) DeleteTest(
+	ctx context.Context,
+	id uuid.UUID,
+) error {
+	_, err := t.testService.Delete(ctx, id)
+	return err
+}
 
-func (t *testsCases) MakeReportByAnalyze()
+// AddQuestion добавляет новый вопрос для теста
+func (t *testsCases) AddQuestion(ctx context.Context, testId uuid.UUID) (*dto.QuestionResponse, error) {
+	question, err := t.questionService.Create(ctx, testId, dto.CreateQuestionRequest{
+		Text:   "Сотрите текст и напишите свой вопрос",
+		Type:   "multiple",
+		Points: 1,
+	})
+	if err != nil {
+		return nil, err
+	}
 
-func (t *testsCases) DeleteRawResults()
-func (t *testsCases) DeleteAllRawByTest()
+	return &dto.QuestionResponse{
+		ID:     question.ID,
+		Text:   question.Text,
+		Type:   question.Type,
+		Points: question.Points,
+	}, nil
+}
 
-// Работа админа c результами
-func (t *testsCases) GetListByTest()
+// EditQuestion позволяет редактировать текстовое поле и тип вопроса
+func (t *testsCases) EditQuestion(ctx context.Context, id uint, data dto.UpdateQuestionRequest) (*dto.QuestionResponse, error) {
+	question, err := t.questionService.Update(ctx, id, data)
+	if err != nil {
+		return nil, err
+	}
 
-func (t *testsCases) SendResultByEmail()
+	options, err := t.optionService.GetByQuestionID(ctx, question.ID)
+	if err != nil {
+		return nil, err
+	}
 
-func (t *testsCases) SendAllResultsTestByEmail()
+	optionDtos := make([]dto.OptionResponse, 0, 10)
 
-func (t *testsCases) MakeExcelList()
+	for _, o := range options {
+		optionDto := dto.OptionResponse{
+			ID:        o.ID,
+			Text:      o.Text,
+			IsCorrect: o.IsCorrect,
+		}
 
-func (t *testsCases) DeleteResult()
+		optionDtos = append(optionDtos, optionDto)
+	}
 
-func (t *testsCases) DeleteResultsByTest()
+	return &dto.QuestionResponse{
+		ID:      question.ID,
+		Text:    question.Text,
+		Type:    question.Type,
+		Points:  question.Points,
+		Options: optionDtos,
+	}, nil
+}
+
+// DeleteQuestion удаляет конкретный вопрос
+func (t *testsCases) DeleteQuestion(ctx context.Context, id uint) error {
+	_, err := t.questionService.Delete(ctx, id)
+	return err
+}
+
+// AddOption добавляет новый ответ для вопроса
+func (t *testsCases) AddOption(ctx context.Context, questionId uint) (*dto.OptionResponse, error) {
+	option, err := t.optionService.Create(ctx, questionId, dto.CreateOptionRequest{
+		Text:      "Новый ответ",
+		IsCorrect: false,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.OptionResponse{
+		ID:        option.ID,
+		Text:      option.Text,
+		IsCorrect: option.IsCorrect,
+	}, nil
+}
+
+// EditOption позволяет редактировать текстовое поле и корректность ответа
+func (t *testsCases) EditOption(ctx context.Context, id uint, data dto.UpdateOptionRequest) (*dto.OptionResponse, error) {
+	option, err := t.optionService.Update(ctx, id, data)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.OptionResponse{
+		ID:        option.ID,
+		Text:      option.Text,
+		IsCorrect: option.IsCorrect,
+	}, nil
+}
+
+// DeleteOption удаляет конкретный ответ
+func (t *testsCases) DeleteOption(ctx context.Context, id uint) error {
+	_, err := t.optionService.Delete(ctx, id)
+	return err
+}
