@@ -19,7 +19,7 @@ type RawSubmission struct {
 	AnswersPayload datatypes.JSON `gorm:"type:jsonb"`
 
 	//Статус и время
-	Status    string     `gorm:"type:varchar(20);not null;default:'pending';index"`
+	Status    string     `gorm:"type:varchar(20);not null;default:'started';index"`
 	StartAt   *time.Time `gorm:"type:timestamptz"`
 	EndAt     *time.Time `gorm:"type:timestamptz"`
 	CreatedAt time.Time  `gorm:"autoCreateTime"`
