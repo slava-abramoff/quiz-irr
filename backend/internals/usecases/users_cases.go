@@ -71,6 +71,8 @@ func (u *usersCases) Login(ctx context.Context, data dto.LoginRequest) (*dto.Log
 }
 
 func (u *usersCases) Create(ctx context.Context, data dto.CreateUserRequest) (*dto.UserResponse, error) {
+	data.Password = u.authService.HashPassword(data.Password)
+
 	user, err := u.usersSerivce.Create(ctx, data, false)
 	if err != nil {
 		return nil, err
@@ -146,5 +148,6 @@ func (u *usersCases) GetAuthInfo(r *http.Request) (uint, bool, error) {
 
 func (u *usersCases) BootstrapCreate(dto dto.CreateUserRequest) (*models.Admin, error) {
 	ctx := context.Background()
+	dto.Password = u.authService.HashPassword(dto.Password)
 	return u.usersSerivce.Create(ctx, dto, true)
 }

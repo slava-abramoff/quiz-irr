@@ -35,10 +35,12 @@ func (a *AuthHandlers) Login(w http.ResponseWriter, r *http.Request, _ httproute
 
 	if !validator.IsValidEmail(req.Email) {
 		httpresponse.ErrorResponse(w, fmt.Errorf("Invalid email").Error(), 422)
+		return
 	}
 
-	if !validator.IsValidLength(req.Password, 16, 8) {
+	if !validator.IsValidLength(req.Password, 16, 7) {
 		httpresponse.ErrorResponse(w, fmt.Errorf("Invalid password").Error(), 422)
+		return
 	}
 
 	data, err := a.auth.Login(ctx, req)
