@@ -3,8 +3,10 @@ package usecases
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"quiz-irr/internals/handlers/dto"
 	"quiz-irr/internals/storage/models"
+	"strings"
 )
 
 type AuthServiceProvider interface {
@@ -12,6 +14,7 @@ type AuthServiceProvider interface {
 	ComparePassword(hash, password string) bool
 	MakeAccessToken(admin *models.Admin) (string, error)
 	MakeRefreshToken(admin *models.Admin) (string, error)
+	GetPayload(tokenString string) (*dto.TokenPayload, error)
 }
 
 type UserServiceProvider interface {
@@ -125,6 +128,20 @@ func (u *usersCases) Delete(ctx context.Context, id uint) (*dto.UserResponse, er
 		Email:    user.Email,
 		IsRoot:   user.IsRoot,
 	}, nil
+}
+
+func (u *usersCases) GetAuthInfo(r *http.Request) (uint, bool, error) {
+	authHeader := r.Header.Get("Authorization")
+
+	const prefix = "Bearer "
+	token := strings.TrimPrefix(authHeader, prefix)
+
+	payload, err := u.authService.GetPayload(token)
+	if err != nil {
+		return 0, false, err
+	}
+
+	return payload.ID, payload.IsRoot, nil
 }
 
 func (u *usersCases) BootstrapCreate(dto dto.CreateUserRequest) (*models.Admin, error) {

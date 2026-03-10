@@ -16,15 +16,15 @@ type AuthProvider interface {
 	Login(ctx context.Context, data dto.LoginRequest) (*dto.LoginResponse, error)
 }
 
-type authHandlers struct {
+type AuthHandlers struct {
 	auth AuthProvider
 }
 
-func NewAuthHandlers(a AuthProvider) *authHandlers {
-	return &authHandlers{auth: a}
+func NewAuthHandlers(a AuthProvider) *AuthHandlers {
+	return &AuthHandlers{auth: a}
 }
 
-func (a *authHandlers) Login(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (a *AuthHandlers) Login(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := r.Context()
 
 	var req dto.LoginRequest

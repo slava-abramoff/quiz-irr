@@ -25,7 +25,7 @@ type QuestionServiceProvider interface {
 type TestServiceProvider interface {
 	Create(ctx context.Context, authorId uint, data dto.CreateTestRequest) (*models.Test, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*models.Test, error)
-	Update(ctx context.Context, data dto.UpdateTestRequest) (*models.Test, error)
+	Update(ctx context.Context, id uuid.UUID, data dto.UpdateTestRequest) (*models.Test, error)
 	Delete(ctx context.Context, id uuid.UUID) (*models.Test, error)
 }
 
@@ -90,7 +90,7 @@ func (t *testsCases) GetTestPreview(
 	}, nil
 }
 
-func (t *testsCases) FindManyTests()
+// func (t *testsCases) FindManyTests()
 
 // GetTestFullData выводит информацию по тесту, включая вопросов и ответов
 func (t *testsCases) GetTestFullData(
@@ -157,9 +157,10 @@ func (t *testsCases) GetTestFullData(
 // UpdateTest обновляет некоторые поля теста
 func (t *testsCases) UpdateTest(
 	ctx context.Context,
+	id uuid.UUID,
 	data dto.UpdateTestRequest,
 ) (*dto.TestAdminResponse, error) {
-	test, err := t.testService.Update(ctx, data)
+	test, err := t.testService.Update(ctx, id, data)
 	if err != nil {
 		return nil, nil
 	}
