@@ -9,7 +9,7 @@ import (
 
 type RawSubmission struct {
 	ID     uuid.UUID `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
-	TestID string    `gorm:"type:uuid;not null;index"`
+	TestID uuid.UUID `gorm:"type:uuid;not null;index"`
 	Test   Test      `gorm:"foreignKey:TestID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 
 	FullName string `gorm:"type:varchar(255);not null"`

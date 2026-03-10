@@ -23,3 +23,10 @@ type TestAdminResponse struct {
 	Author    string             `json:"author"`
 	Questions []QuestionResponse `json:"questions"`
 }
+
+type TestCustomerResponse struct {
+	Title   string `json:"title"`
+	Desc    string `json:"desc"`
+	StartAt string `json:"start_at"`
+	EndAt   string `json:"end_at"`
+}
