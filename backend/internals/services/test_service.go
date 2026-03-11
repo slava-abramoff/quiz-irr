@@ -69,6 +69,10 @@ func (t *testService) Update(ctx context.Context, id uuid.UUID, data dto.UpdateT
 		updated["is_active"] = *data.IsActive
 	}
 
+	if data.Duration != nil {
+		updated["duration"] = *data.Duration
+	}
+
 	if data.StartAt != nil {
 		updated["start_at"] = *data.StartAt
 	}

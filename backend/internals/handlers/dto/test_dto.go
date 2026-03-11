@@ -9,6 +9,7 @@ type UpdateTestRequest struct {
 	Title    *string `json:"title"`
 	Desc     *string `json:"desc"`
 	IsActive *bool   `json:"is_active"`
+	Duration *uint   `json:"duration"`
 	StartAt  *string `json:"start_at"`
 	EndAt    *string `json:"end_at"`
 }
@@ -21,12 +22,14 @@ type TestAdminResponse struct {
 	StartAt   string             `json:"start_at"`
 	EndAt     string             `json:"end_at"`
 	Author    string             `json:"author"`
+	Duration  uint               `json:"duration"`
 	Questions []QuestionResponse `json:"questions"`
 }
 
 type TestCustomerResponse struct {
-	Title   string `json:"title"`
-	Desc    string `json:"desc"`
-	StartAt string `json:"start_at"`
-	EndAt   string `json:"end_at"`
+	Title    string `json:"title"`
+	Desc     string `json:"desc"`
+	Duration uint   `json:"duration"`
+	StartAt  string `json:"start_at"`
+	EndAt    string `json:"end_at"`
 }

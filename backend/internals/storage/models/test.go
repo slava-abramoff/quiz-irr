@@ -15,6 +15,7 @@ type Test struct {
 	Title    string `gorm:"type:varchar(255);not null"`
 	Desc     string `gorm:"type:text"`
 	IsActive bool   `gorm:"not null;default:false"`
+	Duration uint   `gorm:"default:0"`
 
 	// Работа со временем
 	StartAt   *time.Time `gorm:"type:timestamptz"`

@@ -170,6 +170,7 @@ func (t *testsCases) UpdateTest(
 		Title:    test.Title,
 		Desc:     test.Desc,
 		IsActive: test.IsActive,
+		Duration: test.Duration,
 		StartAt:  test.StartAt.Format("2006-01-02 15:04:05"),
 		EndAt:    test.EndAt.Format("2006-01-02 15:04:05"),
 		Author:   test.Author.FullName,
