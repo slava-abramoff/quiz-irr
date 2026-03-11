@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"quiz-irr/internals/handlers/dto"
@@ -49,7 +50,7 @@ func (u *usersCases) Login(ctx context.Context, data dto.LoginRequest) (*dto.Log
 	}
 
 	if !u.authService.ComparePassword(user.Password, data.Password) {
-		return nil, err
+		return nil, errors.New("Invalid password")
 	}
 
 	access, err := u.authService.MakeAccessToken(user)

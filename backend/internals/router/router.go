@@ -10,6 +10,7 @@ func NewRouter(
 	a *handlers.AuthHandlers,
 	u *handlers.UserHandlers,
 	t *handlers.TestHandlers,
+	e *handlers.ExamHandlers,
 	auth func(onlyRoot bool) func(httprouter.Handle) httprouter.Handle,
 ) *httprouter.Router {
 	router := httprouter.New()
@@ -35,6 +36,11 @@ func NewRouter(
 	router.POST("/api/options/question/:id", t.AddOption)
 	router.PATCH("/api/options/:id", t.EditOption)
 	router.DELETE("/api/options/:id", t.DeleteOption)
+
+	// Прохождение теста
+	router.GET("/api/exam/info/:testId", e.GetTestInfo)
+	router.POST("/api/exam/start/:testId", e.StartTest)
+	router.POST("/api/exam/save/:rawId", e.SaveAnswers)
 
 	return router
 }

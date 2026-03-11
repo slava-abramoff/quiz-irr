@@ -23,6 +23,9 @@ type OptionInfoProvider interface {
 }
 
 type RawDataServiceProvider interface {
+	Load(ctx context.Context, id uuid.UUID) (*dto.SendUserAnswersRequest, error)
+	SavePayload(ctx context.Context, id uuid.UUID, data dto.SendUserAnswersRequest) (*models.RawSubmission, error)
+	GetByTestID(ctx context.Context, testId uuid.UUID) ([]models.RawSubmission, error)
 	Create(ctx context.Context, testId uuid.UUID, f, e, o string, start time.Time) (*models.RawSubmission, error)
 }
 
@@ -33,10 +36,12 @@ type examCases struct {
 	rawDataService  RawDataServiceProvider
 }
 
-func NewExamCases(t TestInfoProvider, r RawDataServiceProvider) *examCases {
+func NewExamCases(t TestInfoProvider, r RawDataServiceProvider, o OptionInfoProvider, q QuestionInfoProvider) *examCases {
 	return &examCases{
-		testService:    t,
-		rawDataService: r,
+		testService:     t,
+		rawDataService:  r,
+		optionService:   o,
+		questionService: q,
 	}
 }
 
@@ -115,7 +120,16 @@ func (e *examCases) StartTest(ctx context.Context, id uuid.UUID, data dto.StartE
 	}, nil
 }
 
-// func (t *testsCases) SaveAnswers()
+func (e *examCases) SaveAnswers(ctx context.Context, rawId uuid.UUID, data dto.SendUserAnswersRequest) (*dto.SendUserAnswersResponse, error) {
+	_, err := e.rawDataService.SavePayload(ctx, rawId, data)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.SendUserAnswersResponse{
+		Message: "Ожидайте результатов",
+	}, nil
+}
 
 func (e *examCases) isTimeToStart(startAt, endAt time.Time) bool {
 	now := time.Now()

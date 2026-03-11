@@ -22,7 +22,7 @@ func (r *rawRepo) Create(
 	ctx context.Context,
 	testId uuid.UUID,
 	fn, email, org string,
-	start, end time.Time,
+	start time.Time,
 ) (*models.RawSubmission, error) {
 
 	sub := &models.RawSubmission{
@@ -31,7 +31,6 @@ func (r *rawRepo) Create(
 		Email:    email,
 		Org:      org,
 		StartAt:  &start,
-		EndAt:    &end,
 	}
 
 	if err := r.db.WithContext(ctx).Create(sub).Error; err != nil {
@@ -66,7 +65,9 @@ func (r *rawRepo) SavePayload(
 	res := r.db.WithContext(ctx).
 		Model(&models.RawSubmission{}).
 		Where("id = ?", id).
-		Update("answers_payload", payload)
+		Update("answers_payload", payload).
+		Update("end_at", time.Now()).
+		Update("status", "end")
 
 	if res.Error != nil {
 		return nil, res.Error

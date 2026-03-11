@@ -23,23 +23,33 @@ func main() {
 	testsRepo := storage.NewTestsRepo(db)
 	questionsRepo := storage.NewQuestionsRepo(db)
 	optionsRepo := storage.NewOptionsRepo(db)
+	rawRepo := storage.NewRawRepo(db)
 
 	usersService := services.NewUsersService(usersRepo)
 	authService := services.NewAuthServce("FDGSSDFGSDFG")
 	testsService := services.NewTestService(testsRepo)
 	questionsService := services.NewQuestionService(questionsRepo)
 	optionsService := services.NewOptionService(optionsRepo)
+	rawService := services.NewRawService(rawRepo)
 
 	testCases := usecases.NewTestsCases(testsService, optionsService, questionsService)
 	userCases := usecases.NewUsersCases(usersService, authService)
+	examCases := usecases.NewExamCases(testsService, rawService, optionsService, questionsService)
 
 	testHandler := handlers.NewTestHandlers(testCases, userCases)
 	authHandlers := handlers.NewAuthHandlers(userCases)
 	userHandlers := handlers.NewUserHandlers(userCases)
+	examHandlers := handlers.NewExamHandlers(examCases)
 
 	authMiddlware := middlewares.NewAuthMiddleware(authService)
 
-	r := router.NewRouter(authHandlers, userHandlers, testHandler, authMiddlware)
+	r := router.NewRouter(
+		authHandlers,
+		userHandlers,
+		testHandler,
+		examHandlers,
+		authMiddlware,
+	)
 	root, err := userCases.BootstrapCreate(dto.CreateUserRequest{
 		FullName: "Абрамов Вячеслав Александрович",
 		Password: "changeme",
