@@ -14,6 +14,7 @@ import (
 
 type AuthProvider interface {
 	Login(ctx context.Context, data dto.LoginRequest) (*dto.LoginResponse, error)
+	RefreshAccessToken(refreshToken string) (string, error)
 }
 
 type AuthHandlers struct {

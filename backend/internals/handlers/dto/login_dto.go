@@ -17,3 +17,11 @@ type TokenPayload struct {
 	Email  string
 	IsRoot bool
 }
+
+type RefreshTokenRequest struct {
+	AccessToken string `json:"access_token"`
+}
+
+type RefreshTokenResponse struct {
+	RefreshToken string `json:"refresh_token"`
+}

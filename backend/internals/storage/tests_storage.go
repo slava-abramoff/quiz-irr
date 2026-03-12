@@ -43,7 +43,7 @@ func (t *testsRepo) Create(
 	return test, nil
 }
 
-func (t *testsRepo) FindMany(ctx context.Context, take, skip uint) ([]models.Test, uint, error) {
+func (t *testsRepo) FindMany(ctx context.Context, skip, take uint) ([]models.Test, uint, error) {
 	var tests []models.Test
 	var total int64
 

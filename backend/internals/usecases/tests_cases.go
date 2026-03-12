@@ -25,6 +25,7 @@ type QuestionServiceProvider interface {
 type TestServiceProvider interface {
 	Create(ctx context.Context, authorId uint, data dto.CreateTestRequest) (*models.Test, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*models.Test, error)
+	FindMany(ctx context.Context, skip, take uint) ([]models.Test, *dto.Pagination, error)
 	Update(ctx context.Context, id uuid.UUID, data dto.UpdateTestRequest) (*models.Test, error)
 	Delete(ctx context.Context, id uuid.UUID) (*models.Test, error)
 }
@@ -90,7 +91,34 @@ func (t *testsCases) GetTestPreview(
 	}, nil
 }
 
-// func (t *testsCases) FindManyTests()
+func (t *testsCases) FindManyTests(ctx context.Context, skip, take uint) (*dto.GetManyTestsResponse, error) {
+	tests, pagination, err := t.testService.FindMany(ctx, skip, take)
+	if err != nil {
+		return nil, err
+	}
+
+	testDtos := make([]dto.TestAdminResponse, 0, take)
+
+	for _, test := range tests {
+		testDto := dto.TestAdminResponse{
+			ID:       test.ID.String(),
+			Title:    test.Title,
+			Desc:     test.Desc,
+			IsActive: test.IsActive,
+			StartAt:  test.StartAt.Format("2006-01-02 15:04:05"),
+			EndAt:    test.EndAt.Format("2006-01-02 15:04:05"),
+			Author:   test.Author.FullName,
+			Duration: test.Duration,
+		}
+
+		testDtos = append(testDtos, testDto)
+	}
+
+	return &dto.GetManyTestsResponse{
+		Pagination: *pagination,
+		Tests:      testDtos,
+	}, nil
+}
 
 // GetTestFullData выводит информацию по тесту, включая вопросов и ответов
 func (t *testsCases) GetTestFullData(

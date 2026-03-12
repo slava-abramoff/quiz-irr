@@ -14,6 +14,11 @@ type UpdateTestRequest struct {
 	EndAt    *string `json:"end_at"`
 }
 
+type GetManyTestsResponse struct {
+	Tests      []TestAdminResponse `json:"tests"`
+	Pagination Pagination          `json:"pagination"`
+}
+
 type TestAdminResponse struct {
 	ID        string             `json:"id"`
 	Title     string             `json:"title"`

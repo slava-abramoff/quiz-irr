@@ -19,7 +19,7 @@ type TestStorageProvider interface {
 		startAt time.Time,
 		endAt time.Time,
 	) (*models.Test, error)
-	FindMany(ctx context.Context, take, skip uint) ([]models.Test, uint, error)
+	FindMany(ctx context.Context, skip, take uint) ([]models.Test, uint, error)
 	GetByAuthor(ctx context.Context, authorId uint) ([]models.Test, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*models.Test, error)
 	Update(
@@ -52,6 +52,27 @@ func (t *testService) Create(ctx context.Context, authorId uint, data dto.Create
 
 func (t *testService) GetByID(ctx context.Context, id uuid.UUID) (*models.Test, error) {
 	return t.storage.GetByID(ctx, id)
+}
+
+func (t *testService) FindMany(ctx context.Context, skip, take uint) ([]models.Test, *dto.Pagination, error) {
+	tests, count, err := t.storage.FindMany(ctx, skip, take)
+	if err != nil {
+		return tests, nil, err
+	}
+
+	currentPage := skip/take + 1
+	totalPages := (count + take - 1) / take
+
+	pagination := &dto.Pagination{
+		CurrentPage:     currentPage,
+		TotalPages:      totalPages,
+		TotalItems:      count,
+		ItemsPerPage:    take,
+		HasNextPage:     currentPage < totalPages,
+		HasPreviousPage: currentPage > 1,
+	}
+
+	return tests, pagination, nil
 }
 
 func (t *testService) Update(ctx context.Context, id uuid.UUID, data dto.UpdateTestRequest) (*models.Test, error) {

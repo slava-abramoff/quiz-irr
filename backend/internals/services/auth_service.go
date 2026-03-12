@@ -55,6 +55,31 @@ func (a *authService) MakeRefreshToken(admin *models.Admin) (string, error) {
 	return token.SignedString([]byte(a.secret))
 }
 
+func (a *authService) RefreshAccessToken(refreshToken string) (string, error) {
+	token, err := jwt.Parse(refreshToken, func(token *jwt.Token) (interface{}, error) {
+		return []byte(a.secret), nil
+	})
+	if err != nil {
+		return "", err
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
+		return "", err
+	}
+
+	adminID := uint(claims["id"].(float64))
+
+	newClaims := jwt.MapClaims{
+		"id":  adminID,
+		"exp": time.Now().Add(15 * time.Minute).Unix(),
+	}
+
+	newToken := jwt.NewWithClaims(jwt.SigningMethodHS256, newClaims)
+
+	return newToken.SignedString([]byte(a.secret))
+}
+
 func (a *authService) GetPayload(tokenString string) (*dto.TokenPayload, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return []byte(a.secret), nil

@@ -71,6 +71,8 @@ func (u *usersCases) Login(ctx context.Context, data dto.LoginRequest) (*dto.Log
 	}, nil
 }
 
+func (u *usersCases) Refresh(ctx context.Context) {}
+
 func (u *usersCases) Create(ctx context.Context, data dto.CreateUserRequest) (*dto.UserResponse, error) {
 	data.Password = u.authService.HashPassword(data.Password)
 

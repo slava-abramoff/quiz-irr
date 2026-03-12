@@ -26,6 +26,7 @@ type TestsProvider interface {
 		ctx context.Context,
 		testId uuid.UUID,
 	) (*dto.TestAdminResponse, error)
+	FindManyTests(ctx context.Context, skip, take uint) (*dto.GetManyTestsResponse, error)
 	GetTestFullData(
 		ctx context.Context,
 		testId uuid.UUID,
@@ -79,6 +80,38 @@ func (t *TestHandlers) NewTest(w http.ResponseWriter, r *http.Request, _ httprou
 	}
 
 	httpresponse.JsonResponse(w, test, 200)
+}
+
+// GET /api/tests/many
+func (t *TestHandlers) FindManyTests(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	ctx := r.Context()
+	q := r.URL.Query()
+
+	skipStr := q.Get("skip")
+	takeStr := q.Get("take")
+
+	skip, err := strconv.Atoi(skipStr)
+	if err != nil {
+		httpresponse.ErrorResponse(w, "Invalid skip value", http.StatusBadRequest)
+		return
+	}
+	take, err := strconv.Atoi(takeStr)
+	if err != nil {
+		httpresponse.ErrorResponse(w, "Invalid take value", http.StatusBadRequest)
+		return
+	}
+
+	if take == 0 {
+		take += 1
+	}
+
+	tests, err := t.tests.FindManyTests(ctx, uint(skip), uint(take))
+	if err != nil {
+		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)
+		return
+	}
+
+	httpresponse.JsonResponse(w, tests, 200)
 }
 
 // GET /api/tests/:id/:mode
