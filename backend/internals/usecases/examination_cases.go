@@ -25,7 +25,6 @@ type OptionInfoProvider interface {
 type RawDataServiceProvider interface {
 	Load(ctx context.Context, id uuid.UUID) (*dto.SendUserAnswersRequest, error)
 	SavePayload(ctx context.Context, id uuid.UUID, data dto.SendUserAnswersRequest) (*models.RawSubmission, error)
-	GetByTestID(ctx context.Context, testId uuid.UUID) ([]models.RawSubmission, error)
 	Create(ctx context.Context, testId uuid.UUID, f, e, o string, start time.Time) (*models.RawSubmission, error)
 }
 

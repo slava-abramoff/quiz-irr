@@ -23,7 +23,7 @@ type QuestionStorageProvider interface {
 	) (*models.Question, error)
 	GetByID(
 		ctx context.Context,
-		id uuid.UUID,
+		id uint,
 	) (*models.Question, error)
 	GetByTestID(
 		ctx context.Context,
@@ -51,6 +51,10 @@ func (q *questionService) Create(ctx context.Context, testId uuid.UUID, data dto
 		data.Type,
 		data.Points,
 	)
+}
+
+func (q *questionService) GetByID(ctx context.Context, id uint) (*models.Question, error) {
+	return q.storage.GetByID(ctx, id)
 }
 
 func (q *questionService) Update(ctx context.Context, id uint, data dto.UpdateQuestionRequest) (*models.Question, error) {

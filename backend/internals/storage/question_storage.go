@@ -40,13 +40,14 @@ func (q *questionsRepo) Create(
 
 func (q *questionsRepo) GetByID(
 	ctx context.Context,
-	id uuid.UUID,
+	id uint,
 ) (*models.Question, error) {
 	var question models.Question
 
-	if err := q.db.WithContext(ctx).
-		Where("id = ?", id).
-		First(&question).Error; err != nil {
+	err := q.db.WithContext(ctx).
+		First(&question, id).Error
+
+	if err != nil {
 		return nil, err
 	}
 

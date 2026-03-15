@@ -40,18 +40,42 @@ func (r *rawRepo) Create(
 	return sub, nil
 }
 
-func (r *rawRepo) GetByTestID(ctx context.Context, testId uuid.UUID) ([]models.RawSubmission, error) {
-	var subs []models.RawSubmission
+func (r *rawRepo) GetByID(ctx context.Context, id uuid.UUID) (*models.RawSubmission, error) {
+	var sub models.RawSubmission
 
 	err := r.db.WithContext(ctx).
-		Where("test_id = ?", testId).
-		Find(&subs).Error
+		Where("id = ?", id).
+		First(&sub).Error
 
 	if err != nil {
 		return nil, err
 	}
 
-	return subs, nil
+	return &sub, nil
+}
+
+func (r *rawRepo) GetByTestID(ctx context.Context, testId uuid.UUID, skip, take uint) ([]models.RawSubmission, uint, error) {
+	var (
+		subs  []models.RawSubmission
+		count int64
+	)
+
+	db := r.db.WithContext(ctx).Model(&models.RawSubmission{}).
+		Where("test_id = ?", testId)
+
+	if err := db.Count(&count).Error; err != nil {
+		return nil, 0, err
+	}
+
+	if err := db.
+		Offset(int(skip)).
+		Limit(int(take)).
+		Order("created_at DESC").
+		Find(&subs).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return subs, uint(count), nil
 }
 
 func (r *rawRepo) SavePayload(
@@ -145,4 +169,10 @@ func (r *rawRepo) Delete(ctx context.Context, id uuid.UUID) (*models.RawSubmissi
 	}
 
 	return &sub, nil
+}
+
+func (r *rawRepo) DeleteAll(ctx context.Context, testId uuid.UUID) error {
+	return r.db.WithContext(ctx).
+		Where("test_id = ?", testId).
+		Delete(&models.RawSubmission{}).Error
 }

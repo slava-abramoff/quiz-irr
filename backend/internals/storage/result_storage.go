@@ -23,11 +23,11 @@ func (r *resultRepo) Create(
 	email string,
 	org string,
 	duration uint,
-	totalScore uint,
+	totalScore int,
 	isOnTime bool,
 ) (*models.TestResult, error) {
 	result := &models.TestResult{
-		TestID:     testId.String(),
+		TestID:     testId,
 		FullName:   fullName,
 		Email:      email,
 		Org:        org,

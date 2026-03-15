@@ -1,9 +1,11 @@
 package models
 
+import "github.com/google/uuid"
+
 type TestResult struct {
-	ID     uint   `gorm:"primaryKey;autoIncrement"`
-	TestID string `gorm:"type:uuid;not null;index"`
-	Test   Test   `gorm:"foreignKey:TestID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	ID     uint      `gorm:"primaryKey;autoIncrement"`
+	TestID uuid.UUID `gorm:"type:uuid;not null;index"`
+	Test   Test      `gorm:"foreignKey:TestID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 
 	// Данные участника
 	FullName string `gorm:"type:varchar(255);not null"`
@@ -13,5 +15,5 @@ type TestResult struct {
 	// Метрики результата
 	Duration   uint `gorm:"not null"`
 	IsOnTime   bool `gorm:"not null;default:false"`
-	TotalScore uint `gorm:"not null;index"`
+	TotalScore int  `gorm:"not null;index"`
 }

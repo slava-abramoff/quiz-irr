@@ -13,6 +13,10 @@ type OptionStorageProvider interface {
 		text string,
 		isCorrect bool,
 	) (*models.Option, error)
+	GetCorrectOptions(
+		ctx context.Context,
+		questionId uint,
+	) ([]models.Option, error)
 	GetByQuestionID(
 		ctx context.Context,
 		questionId uint,
@@ -59,6 +63,14 @@ func (o *optionService) Update(ctx context.Context, id uint, data dto.UpdateOpti
 func (o *optionService) GetByQuestionID(ctx context.Context, questionId uint) ([]models.Option, error) {
 	return o.storage.GetByQuestionID(ctx, questionId)
 }
+
+func (o *optionService) GetCorrectOptions(
+	ctx context.Context,
+	questionId uint,
+) ([]models.Option, error) {
+	return o.storage.GetCorrectOptions(ctx, questionId)
+}
+
 func (o *optionService) Delete(ctx context.Context, id uint) (*models.Option, error) {
 	return o.storage.Delete(ctx, id)
 }

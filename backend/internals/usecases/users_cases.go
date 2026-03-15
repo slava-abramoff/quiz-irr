@@ -16,6 +16,7 @@ type AuthServiceProvider interface {
 	MakeAccessToken(admin *models.Admin) (string, error)
 	MakeRefreshToken(admin *models.Admin) (string, error)
 	GetPayload(tokenString string) (*dto.TokenPayload, error)
+	RefreshAccessToken(refreshToken string) (string, error)
 }
 
 type UserServiceProvider interface {
@@ -71,7 +72,16 @@ func (u *usersCases) Login(ctx context.Context, data dto.LoginRequest) (*dto.Log
 	}, nil
 }
 
-func (u *usersCases) Refresh(ctx context.Context) {}
+func (u *usersCases) Refresh(ctx context.Context, data dto.RefreshTokenRequest) (*dto.RefreshTokenResponse, error) {
+	token, err := u.authService.RefreshAccessToken(data.RefreshToken)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.RefreshTokenResponse{
+		AccessToken: token,
+	}, nil
+}
 
 func (u *usersCases) Create(ctx context.Context, data dto.CreateUserRequest) (*dto.UserResponse, error) {
 	data.Password = u.authService.HashPassword(data.Password)

@@ -22,7 +22,7 @@ func NewRouter(
 	router.PATCH("/api/users/:id", onlyRoot(u.Update))
 	router.DELETE("/api/users/:id", onlyRoot(u.Delete))
 	router.POST("/api/auth/login", a.Login)
-	// refresh
+	router.POST("/api/auth/refresh", a.Refresh)
 
 	// Работа админа с тестами
 	router.POST("/api/tests/init", basicAuth(t.NewTest))

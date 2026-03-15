@@ -14,7 +14,7 @@ import (
 
 type AuthProvider interface {
 	Login(ctx context.Context, data dto.LoginRequest) (*dto.LoginResponse, error)
-	RefreshAccessToken(refreshToken string) (string, error)
+	Refresh(ctx context.Context, data dto.RefreshTokenRequest) (*dto.RefreshTokenResponse, error)
 }
 
 type AuthHandlers struct {
@@ -45,6 +45,24 @@ func (a *AuthHandlers) Login(w http.ResponseWriter, r *http.Request, _ httproute
 	}
 
 	data, err := a.auth.Login(ctx, req)
+	if err != nil {
+		httpresponse.ErrorResponse(w, "Error", http.StatusFound)
+		return
+	}
+
+	httpresponse.JsonResponse(w, data, 200)
+}
+
+func (a *AuthHandlers) Refresh(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	ctx := r.Context()
+
+	var req dto.RefreshTokenRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		httpresponse.ErrorResponse(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+
+	data, err := a.auth.Refresh(ctx, req)
 	if err != nil {
 		httpresponse.ErrorResponse(w, "Error", http.StatusFound)
 		return

@@ -35,6 +35,24 @@ func (o *optionsRepo) Create(
 	return option, nil
 }
 
+func (o *optionsRepo) GetCorrectOptions(
+	ctx context.Context,
+	questionId uint,
+) ([]models.Option, error) {
+
+	var opts []models.Option
+
+	err := o.db.WithContext(ctx).
+		Where("question_id = ? AND is_correct = ?", questionId, true).
+		Find(&opts).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return opts, nil
+}
+
 func (o *optionsRepo) GetByQuestionID(
 	ctx context.Context,
 	questionId uint,
