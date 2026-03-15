@@ -24,6 +24,7 @@ func main() {
 	questionsRepo := storage.NewQuestionsRepo(db)
 	optionsRepo := storage.NewOptionsRepo(db)
 	rawRepo := storage.NewRawRepo(db)
+	resultsRepo := storage.NewResultRepo(db)
 
 	usersService := services.NewUsersService(usersRepo)
 	authService := services.NewAuthServce("FDGSSDFGSDFG")
@@ -31,15 +32,25 @@ func main() {
 	questionsService := services.NewQuestionService(questionsRepo)
 	optionsService := services.NewOptionService(optionsRepo)
 	rawService := services.NewRawService(rawRepo)
+	resultsService := services.NewResultsService(resultsRepo)
 
 	testCases := usecases.NewTestsCases(testsService, optionsService, questionsService)
 	userCases := usecases.NewUsersCases(usersService, authService)
 	examCases := usecases.NewExamCases(testsService, rawService, optionsService, questionsService)
+	rawAnswersCases := usecases.NewRawAnswersCases(
+		rawService,
+		questionsService,
+		optionsService,
+		resultsService,
+	)
+	resultsCases := usecases.NewResultsCases(resultsService)
 
 	testHandler := handlers.NewTestHandlers(testCases, userCases)
 	authHandlers := handlers.NewAuthHandlers(userCases)
 	userHandlers := handlers.NewUserHandlers(userCases)
 	examHandlers := handlers.NewExamHandlers(examCases)
+	rawAnswersHandlers := handlers.NewRawAnswersHandlers(rawAnswersCases)
+	resultsHandlers := handlers.NewResultsHandlers(resultsCases)
 
 	authMiddlware := middlewares.NewAuthMiddleware(authService)
 
@@ -48,6 +59,8 @@ func main() {
 		userHandlers,
 		testHandler,
 		examHandlers,
+		rawAnswersHandlers,
+		resultsHandlers,
 		authMiddlware,
 	)
 	root, err := userCases.BootstrapCreate(dto.CreateUserRequest{

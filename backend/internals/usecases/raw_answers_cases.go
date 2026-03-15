@@ -2,7 +2,6 @@ package usecases
 
 import (
 	"context"
-	"errors"
 	"quiz-irr/internals/handlers/dto"
 	"quiz-irr/internals/storage/models"
 	"sort"
@@ -25,6 +24,8 @@ type RawDataProvider interface {
 	GetByTestID(ctx context.Context, testId uuid.UUID, skip, take uint) ([]models.RawSubmission, *dto.Pagination, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*models.RawSubmission, error)
 	СonvertFromJSON(data datatypes.JSON) (dto.SendUserAnswersRequest, error)
+	Delete(ctx context.Context, rawId uuid.UUID) (*models.RawSubmission, error)
+	DeleteAll(ctx context.Context, testId uuid.UUID) error
 }
 
 type ResultsSaveProvider interface {
@@ -89,14 +90,14 @@ func (rw *rawAnswersCases) FindRawResults(ctx context.Context, testId uuid.UUID,
 	}, nil
 }
 
-func (rw *rawAnswersCases) AnalyzeResults(ctx context.Context, rawId uuid.UUID) error {
+func (rw *rawAnswersCases) AnalyzeResults(ctx context.Context, rawId uuid.UUID) (*dto.Message, error) {
 	raw, err := rw.rawService.GetByID(ctx, rawId)
 	if err != nil {
-		// TODO: обработать
+		return nil, err
 	}
 
 	if raw.Status == "started" {
-		return errors.New("Not")
+		return &dto.Message{Message: "Тест находится в процессе прохождения"}, nil
 	}
 
 	var totalScore int
@@ -104,7 +105,7 @@ func (rw *rawAnswersCases) AnalyzeResults(ctx context.Context, rawId uuid.UUID) 
 
 	userAnswers, err := rw.rawService.СonvertFromJSON(raw.AnswersPayload)
 	if err != nil {
-		// TODO: обработать
+		return nil, err
 	}
 
 	answers := userAnswers.Answers
@@ -114,12 +115,12 @@ func (rw *rawAnswersCases) AnalyzeResults(ctx context.Context, rawId uuid.UUID) 
 
 		question, err := rw.questionService.GetByID(ctx, answer.ID)
 		if err != nil {
-			// TODO: обработать
+			return nil, err
 		}
 
 		options, err := rw.optionService.GetCorrectOptions(ctx, question.ID)
 		if err != nil {
-			// TODO: обработать
+			return nil, err
 		}
 
 		if question.Type == "single" {
@@ -176,14 +177,35 @@ func (rw *rawAnswersCases) AnalyzeResults(ctx context.Context, rawId uuid.UUID) 
 		totalScore,
 		isOnTime,
 	)
+	if err != nil {
+		return nil, err
+	}
 
-	return err
+	return &dto.Message{Message: "Ответы обработаны, подготовлены результаты"}, nil
 }
 
-func (rw *rawAnswersCases) AnalyzeAllResults(ctx context.Context, testId uuid.UUID)
+// func (rw *rawAnswersCases) AnalyzeAllResults(ctx context.Context, testId uuid.UUID)
 
 // func (rw *rawAnswersCases) MakeReportByAnalyze(ctx context.Context, rawId uuid.UUID)
 
-func (rw *rawAnswersCases) DeleteRawResults(ctx context.Context, rawId uuid.UUID)
+func (rw *rawAnswersCases) DeleteRawResults(ctx context.Context, rawId uuid.UUID) (*dto.Message, error) {
+	_, err := rw.rawService.Delete(ctx, rawId)
+	if err != nil {
+		return nil, err
+	}
 
-func (rw *rawAnswersCases) DeleteAllRawByTest(ctx context.Context, testId uuid.UUID)
+	return &dto.Message{
+		Message: "Ответы пользолвателя удалены",
+	}, nil
+}
+
+func (rw *rawAnswersCases) DeleteAllRawByTest(ctx context.Context, testId uuid.UUID) (*dto.Message, error) {
+	err := rw.rawService.DeleteAll(ctx, testId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.Message{
+		Message: "Ответы пользователей удалены",
+	}, nil
+}

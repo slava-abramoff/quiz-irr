@@ -56,19 +56,53 @@ func (r *resultRepo) GetByID(
 	return result, nil
 }
 
-func (r *resultRepo) GetByTestID(
+func (r *resultRepo) GetAllByTestID(
 	ctx context.Context,
 	testId uuid.UUID,
 ) ([]models.TestResult, error) {
+
 	var results []models.TestResult
 
-	if err := r.db.WithContext(ctx).
-		Where("test_id = ?", testId.String()).
-		Find(&results).Error; err != nil {
+	err := r.db.WithContext(ctx).
+		Where("test_id = ?", testId).
+		Order("id DESC").
+		Find(&results).
+		Error
+
+	if err != nil {
 		return nil, err
 	}
 
 	return results, nil
+}
+
+func (r *resultRepo) GetByTestID(
+	ctx context.Context,
+	testId uuid.UUID,
+	skip, take uint,
+) ([]models.TestResult, uint, error) {
+
+	var (
+		results []models.TestResult
+		count   int64
+	)
+
+	db := r.db.WithContext(ctx).Model(&models.TestResult{}).
+		Where("test_id = ?", testId)
+
+	if err := db.Count(&count).Error; err != nil {
+		return nil, 0, err
+	}
+
+	if err := db.
+		Offset(int(skip)).
+		Limit(int(take)).
+		Order("id DESC").
+		Find(&results).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return results, uint(count), nil
 }
 
 func (r *resultRepo) Update(
@@ -104,4 +138,15 @@ func (r *resultRepo) Delete(
 	}
 
 	return result, nil
+}
+
+func (r *resultRepo) DeleteByTestID(
+	ctx context.Context,
+	testId uuid.UUID,
+) error {
+
+	return r.db.WithContext(ctx).
+		Where("test_id = ?", testId).
+		Delete(&models.TestResult{}).
+		Error
 }
