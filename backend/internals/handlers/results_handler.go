@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"quiz-irr/internals/handlers/dto"
 	"quiz-irr/pkg/httpresponse"
@@ -63,6 +64,7 @@ func (res *ResultsHandlers) GetListByTest(w http.ResponseWriter, r *http.Request
 	}
 
 	httpresponse.JsonResponse(w, results, 200)
+	log.Println("get list by test")
 }
 
 // DELETE /api/results/:resultId
@@ -83,6 +85,7 @@ func (res *ResultsHandlers) DeleteResult(w http.ResponseWriter, r *http.Request,
 	}
 
 	httpresponse.JsonResponse(w, msg, 200)
+	log.Println("delete result")
 }
 
 // DELETE /api/results/test/:testId
@@ -103,4 +106,5 @@ func (res *ResultsHandlers) DeleteResultsByTest(w http.ResponseWriter, r *http.R
 	}
 
 	httpresponse.JsonResponse(w, msg, 200)
+	log.Println("delete results")
 }

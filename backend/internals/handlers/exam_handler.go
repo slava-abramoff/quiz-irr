@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 	"quiz-irr/internals/handlers/dto"
 	"quiz-irr/pkg/httpresponse"
@@ -43,6 +44,7 @@ func (e *ExamHandlers) GetTestInfo(w http.ResponseWriter, r *http.Request, ps ht
 	}
 
 	httpresponse.JsonResponse(w, info, 200)
+	log.Println("get test info")
 }
 
 // /api/exam/start/:testId
@@ -69,6 +71,7 @@ func (e *ExamHandlers) StartTest(w http.ResponseWriter, r *http.Request, ps http
 	}
 
 	httpresponse.JsonResponse(w, testBody, 200)
+	log.Println("start test")
 }
 
 // /api/exam/save/:rawId
@@ -95,4 +98,5 @@ func (e *ExamHandlers) SaveAnswers(w http.ResponseWriter, r *http.Request, ps ht
 	}
 
 	httpresponse.JsonResponse(w, msg, 200)
+	log.Println("save answers")
 }

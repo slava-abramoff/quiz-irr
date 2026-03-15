@@ -1,0 +1,10 @@
+{
+  "name": "quiz-irr-flow-test",
+  "version": "1.0.0",
+  "description": "E2E flow test for quiz-irr backend API",
+  "type": "module",
+  "scripts": {
+    "test": "node flow-test.js",
+    "test:flow": "node flow-test.js"
+  }
+}

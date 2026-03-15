@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"quiz-irr/internals/handlers/dto"
 	"quiz-irr/pkg/httpresponse"
@@ -64,10 +65,12 @@ func (rw *RawAnswersHandlers) FindRawResults(w http.ResponseWriter, r *http.Requ
 	}
 
 	httpresponse.JsonResponse(w, rawResults, 200)
+	log.Println("find raw results")
 }
 
 // POST /api/raws/analyze/:rawId
 func (rw *RawAnswersHandlers) AnalyzeResults(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	log.Println("start analyze results")
 	ctx := r.Context()
 
 	id := ps.ByName("rawId")
@@ -84,6 +87,7 @@ func (rw *RawAnswersHandlers) AnalyzeResults(w http.ResponseWriter, r *http.Requ
 	}
 
 	httpresponse.JsonResponse(w, msg, 200)
+	log.Println("analyze results")
 }
 
 // POST /api/raws/analyze/test/:testId
@@ -106,6 +110,7 @@ func (rw *RawAnswersHandlers) DeleteRawResults(w http.ResponseWriter, r *http.Re
 	}
 
 	httpresponse.JsonResponse(w, msg, 200)
+	log.Println("delete raw results")
 }
 
 // DELETE /api/raws/test/:testId
@@ -126,4 +131,5 @@ func (rw *RawAnswersHandlers) DeleteAllRawByTest(w http.ResponseWriter, r *http.
 	}
 
 	httpresponse.JsonResponse(w, msg, 200)
+	log.Println("delete all results")
 }

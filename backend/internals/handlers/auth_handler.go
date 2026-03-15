@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"quiz-irr/internals/handlers/dto"
 	"quiz-irr/internals/validator"
@@ -51,6 +52,7 @@ func (a *AuthHandlers) Login(w http.ResponseWriter, r *http.Request, _ httproute
 	}
 
 	httpresponse.JsonResponse(w, data, 200)
+	log.Println("login")
 }
 
 func (a *AuthHandlers) Refresh(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -69,4 +71,5 @@ func (a *AuthHandlers) Refresh(w http.ResponseWriter, r *http.Request, _ httprou
 	}
 
 	httpresponse.JsonResponse(w, data, 200)
+	log.Println("refresh")
 }

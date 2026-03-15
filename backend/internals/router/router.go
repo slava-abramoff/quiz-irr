@@ -47,7 +47,8 @@ func NewRouter(
 	router.POST("/api/exam/save/:rawId", e.SaveAnswers)
 
 	// Сырые результаты
-	router.GET("/api/raws/test/:testId", basicAuth(rw.FindRawResults))
+	// router.GET("/api/raws/test/:testId", basicAuth(rw.FindRawResults))
+	router.GET("/api/raws/test/:testId", rw.FindRawResults)
 	router.POST("/api/raws/analyze/:rawId", basicAuth(rw.AnalyzeResults))
 	// POST /api/raws/test/analyze/:testId
 	// GET /api/raws/answers/report/:rawId

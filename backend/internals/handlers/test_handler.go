@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 	"quiz-irr/internals/handlers/dto"
 	"quiz-irr/pkg/httpresponse"
@@ -80,6 +81,7 @@ func (t *TestHandlers) NewTest(w http.ResponseWriter, r *http.Request, _ httprou
 	}
 
 	httpresponse.JsonResponse(w, test, 200)
+	log.Println("new test")
 }
 
 // GET /api/tests/many
@@ -112,6 +114,7 @@ func (t *TestHandlers) FindManyTests(w http.ResponseWriter, r *http.Request, _ h
 	}
 
 	httpresponse.JsonResponse(w, tests, 200)
+	log.Println("find many tests")
 }
 
 // GET /api/tests/:id/:mode
@@ -141,6 +144,7 @@ func (t *TestHandlers) GetTest(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	httpresponse.JsonResponse(w, test, 200)
+	log.Println("get test")
 }
 
 // PATCH /api/tests/:id
@@ -167,6 +171,7 @@ func (t *TestHandlers) UpdateTest(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	httpresponse.JsonResponse(w, test, 200)
+	log.Println("update test")
 }
 
 // DELETE /api/tests/:id
@@ -187,6 +192,7 @@ func (t *TestHandlers) DeleteTest(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	httpresponse.JsonResponse(w, "Deleted", 200)
+	log.Println("delete test")
 }
 
 // POST /api/questions/test/:id
@@ -207,6 +213,7 @@ func (t *TestHandlers) AddQuestion(w http.ResponseWriter, r *http.Request, ps ht
 	}
 
 	httpresponse.JsonResponse(w, question, 200)
+	log.Println("add question")
 }
 
 // PATCH /api/questions/:id
@@ -233,6 +240,7 @@ func (t *TestHandlers) EditQuestion(w http.ResponseWriter, r *http.Request, ps h
 	}
 
 	httpresponse.JsonResponse(w, question, 200)
+	log.Println("edit question")
 }
 
 // DELETE /api/questions/:id
@@ -253,6 +261,7 @@ func (t *TestHandlers) DeleteQuestion(w http.ResponseWriter, r *http.Request, ps
 	}
 
 	httpresponse.JsonResponse(w, "Deleted", 200)
+	log.Println("delete question")
 }
 
 // POST /api/options/question/:id
@@ -273,6 +282,7 @@ func (t *TestHandlers) AddOption(w http.ResponseWriter, r *http.Request, ps http
 	}
 
 	httpresponse.JsonResponse(w, option, 200)
+	log.Println("add option")
 }
 
 // PATCH /api/options/:id
@@ -299,6 +309,7 @@ func (t *TestHandlers) EditOption(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	httpresponse.JsonResponse(w, option, 200)
+	log.Println("edit option")
 }
 
 // DELETE /api/options/:id
@@ -319,4 +330,5 @@ func (t *TestHandlers) DeleteOption(w http.ResponseWriter, r *http.Request, ps h
 	}
 
 	httpresponse.JsonResponse(w, "Deleted", 200)
+	log.Println("delete option")
 }
