@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { ChangeEvent, FormEvent } from 'react';
+import type { FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getTest, updateTest } from '../api/tests';
 import {
@@ -20,6 +20,9 @@ import type {
   UpdateOptionRequest,
   UpdateTestRequest,
 } from '../api/types';
+import AppHeader from '../components/AppHeader';
+import TestMetaForm from '../components/editor/TestMetaForm';
+import QuestionsEditor from '../components/editor/QuestionsEditor';
 
 type LocalQuestion = QuestionResponse;
 type LocalOption = OptionResponse;
@@ -363,36 +366,9 @@ export default function EditorPage() {
     }
   };
 
-  const handleDurationChange =
-    (field: 'h' | 'm' | 's') =>
-    (event: ChangeEvent<HTMLInputElement>) => {
-      const value = Number.parseInt(event.target.value || '0', 10);
-      const safe = Number.isNaN(value) ? 0 : Math.max(0, value);
-      if (field === 'h') setDurationHours(safe);
-      if (field === 'm') setDurationMinutes(Math.min(59, safe));
-      if (field === 's') setDurationSeconds(Math.min(59, safe));
-    };
-
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="border-b border-gray-200 bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between gap-4">
-          <div>
-            <button
-              type="button"
-              onClick={() => navigate('/')}
-              className="text-left"
-            >
-              <h1 className="text-lg font-semibold text-gray-900">Конструктор тестов</h1>
-              <p className="text-sm text-gray-500">Редактор теста</p>
-            </button>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {/* здесь позже можно добавить элементы управления пользователем */}
-          </div>
-        </div>
-      </header>
+      <AppHeader subtitle="Редактор теста" />
 
       <main className="mx-auto max-w-6xl px-4 py-6 space-y-6">
         {error && (
@@ -411,301 +387,38 @@ export default function EditorPage() {
           </div>
         ) : (
           <>
-            {/* Блок 1: информация о тесте */}
-            <section className="rounded-lg border border-gray-200 bg-white p-5 space-y-4">
-              <h2 className="text-sm font-semibold text-gray-900">Общие настройки теста</h2>
+            <TestMetaForm
+              title={title}
+              desc={desc}
+              startAt={startAt}
+              endAt={endAt}
+              isActive={isActive}
+              durationHours={durationHours}
+              durationMinutes={durationMinutes}
+              durationSeconds={durationSeconds}
+              isSaving={isSavingMeta}
+              onChangeTitle={setTitle}
+              onChangeDesc={setDesc}
+              onChangeStartAt={setStartAt}
+              onChangeEndAt={setEndAt}
+              onToggleActive={() => setIsActive((prev) => !prev)}
+              onDurationChange={(field, value) => {
+                if (field === 'h') setDurationHours(value);
+                if (field === 'm') setDurationMinutes(value);
+                if (field === 's') setDurationSeconds(value);
+              }}
+              onSubmit={handleMetaSubmit}
+            />
 
-              <form onSubmit={handleMetaSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div className="space-y-1.5">
-                    <label
-                      htmlFor="test-title"
-                      className="block text-xs font-medium text-gray-700"
-                    >
-                      Название теста
-                    </label>
-                    <input
-                      id="test-title"
-                      type="text"
-                      value={title}
-                      onChange={(event) => setTitle(event.target.value)}
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <span className="block text-xs font-medium text-gray-700">
-                      Статус
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setIsActive((prev) => !prev)}
-                      className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${
-                        isActive
-                          ? 'bg-emerald-50 text-emerald-700'
-                          : 'bg-gray-100 text-gray-500'
-                      }`}
-                    >
-                      {isActive ? 'Активен' : 'Неактивен'}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label
-                    htmlFor="test-desc"
-                    className="block text-xs font-medium text-gray-700"
-                  >
-                    Описание
-                  </label>
-                  <textarea
-                    id="test-desc"
-                    rows={4}
-                    value={desc}
-                    onChange={(event) => setDesc(event.target.value)}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent resize-none"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                  <div className="space-y-1.5">
-                    <label
-                      htmlFor="test-start-at"
-                      className="block text-xs font-medium text-gray-700"
-                    >
-                      Начало тестирования
-                    </label>
-                    <input
-                      id="test-start-at"
-                      type="datetime-local"
-                      value={startAt}
-                      onChange={(event) => setStartAt(event.target.value)}
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label
-                      htmlFor="test-end-at"
-                      className="block text-xs font-medium text-gray-700"
-                    >
-                      Окончание тестирования
-                    </label>
-                    <input
-                      id="test-end-at"
-                      type="datetime-local"
-                      value={endAt}
-                      onChange={(event) => setEndAt(event.target.value)}
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <span className="block text-xs font-medium text-gray-700">
-                      Длительность теста
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="number"
-                        min={0}
-                        value={durationHours}
-                        onChange={handleDurationChange('h')}
-                        className="w-16 rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                      />
-                      <span className="text-xs text-gray-500">ч</span>
-                      <input
-                        type="number"
-                        min={0}
-                        max={59}
-                        value={durationMinutes}
-                        onChange={handleDurationChange('m')}
-                        className="w-16 rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                      />
-                      <span className="text-xs text-gray-500">мин</span>
-                      <input
-                        type="number"
-                        min={0}
-                        max={59}
-                        value={durationSeconds}
-                        onChange={handleDurationChange('s')}
-                        className="w-16 rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                      />
-                      <span className="text-xs text-gray-500">сек</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-end gap-2 pt-2">
-                  <button
-                    type="submit"
-                    disabled={isSavingMeta}
-                    className="inline-flex items-center rounded-md bg-gray-900 px-4 py-2 text-xs font-medium text-white shadow-sm hover:bg-gray-800 disabled:opacity-60 disabled:cursor-not-allowed"
-                  >
-                    {isSavingMeta ? 'Сохраняем...' : 'Сохранить изменения'}
-                  </button>
-                </div>
-              </form>
-            </section>
-
-            {/* Блок 2: вопросы и ответы */}
-            <section className="rounded-lg border border-gray-200 bg-white p-5 space-y-4">
-              <div className="flex items-center justify-between gap-3">
-                <h2 className="text-sm font-semibold text-gray-900">
-                  Вопросы и ответы
-                </h2>
-              </div>
-
-              {questions.length === 0 ? (
-                <p className="text-sm text-gray-500">
-                  Вопросов пока нет. Добавьте первый вопрос, чтобы начать настраивать тест.
-                </p>
-              ) : (
-                <div className="space-y-4">
-                  {questions.map((question) => (
-                    <div
-                      key={question.id}
-                      className="rounded-md border border-gray-200 bg-gray-50/60 p-4 space-y-3"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1 space-y-2">
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="text"
-                              value={question.text}
-                              onChange={(event) =>
-                                handleUpdateQuestion(question, {
-                                  text: event.target.value,
-                                })
-                              }
-                              className="w-full rounded-md border border-gray-300 px-3 py-1.5 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                            />
-                          </div>
-
-                          <div className="flex flex-wrap items-center gap-3 text-xs text-gray-600">
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-[11px] uppercase tracking-wide text-gray-400">
-                                Тип:
-                              </span>
-                              <select
-                                value={question.type}
-                                onChange={(event) =>
-                                  handleUpdateQuestion(question, {
-                                    type: event.target.value,
-                                  })
-                                }
-                                className="rounded-md border border-gray-300 bg-white px-2 py-1 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                              >
-                                <option value="single">Один ответ</option>
-                                <option value="multiple">Несколько ответов</option>
-                                <option value="text">Текстовый ответ</option>
-                              </select>
-                            </div>
-
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-[11px] uppercase tracking-wide text-gray-400">
-                                Баллы:
-                              </span>
-                              <input
-                                type="number"
-                                min={0}
-                                value={question.points}
-                                onChange={(event) =>
-                                  handleUpdateQuestion(question, {
-                                    points: Number.parseInt(event.target.value || '0', 10),
-                                  })
-                                }
-                                className="w-16 rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                              />
-                            </div>
-                          </div>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteQuestion(question)}
-                          className="inline-flex items-center rounded-md border border-red-200 bg-red-50 px-2 py-1 text-[11px] font-medium text-red-700 hover:bg-red-100"
-                        >
-                          Удалить
-                        </button>
-                      </div>
-
-                      <div className="space-y-2 border-t border-gray-200 pt-3">
-                        <div className="flex items-center justify-between gap-3">
-                          <p className="text-[11px] font-medium uppercase tracking-wide text-gray-400">
-                            Варианты ответов
-                          </p>
-                          <button
-                            type="button"
-                            onClick={() => handleAddOption(question)}
-                            className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2 py-1 text-[11px] font-medium text-gray-700 hover:bg-gray-50"
-                          >
-                            + Вариант
-                          </button>
-                        </div>
-
-                        {(question.options?.length ?? 0) === 0 ? (
-                          <p className="text-xs text-gray-500">
-                            Вариантов пока нет. Добавьте хотя бы один вариант ответа.
-                          </p>
-                        ) : (
-                          <div className="space-y-2">
-                            {(question.options ?? []).map((option) => (
-                              <div
-                                key={option.id}
-                                className="flex items-center gap-2 rounded-md bg-white px-3 py-2 border border-gray-200"
-                              >
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    handleUpdateOption(question, option, {
-                                      is_correct: !option.is_correct,
-                                    })
-                                  }
-                                  className={`inline-flex h-5 w-5 items-center justify-center rounded border text-[10px] ${
-                                    option.is_correct
-                                      ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                                      : 'border-gray-300 bg-white text-gray-400'
-                                  }`}
-                                >
-                                  ✓
-                                </button>
-                                <input
-                                  type="text"
-                                  value={option.text}
-                                  onChange={(event) =>
-                                    handleUpdateOption(question, option, {
-                                      text: event.target.value,
-                                    })
-                                  }
-                                  className="flex-1 rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteOption(question, option)}
-                                  className="inline-flex items-center rounded-md border border-red-200 bg-red-50 px-2 py-1 text-[11px] font-medium text-red-700 hover:bg-red-100"
-                                >
-                                  ×
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <div className="pt-2">
-                <button
-                  type="button"
-                  onClick={handleAddQuestion}
-                  className="inline-flex items-center rounded-md bg-gray-900 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-gray-800"
-                >
-                  + Добавить вопрос
-                </button>
-              </div>
-            </section>
+            <QuestionsEditor
+              questions={questions}
+              onAddQuestion={handleAddQuestion}
+              onUpdateQuestion={handleUpdateQuestion}
+              onDeleteQuestion={handleDeleteQuestion}
+              onAddOption={handleAddOption}
+              onUpdateOption={handleUpdateOption}
+              onDeleteOption={handleDeleteOption}
+            />
           </>
         )}
       </main>
