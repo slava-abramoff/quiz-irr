@@ -131,7 +131,20 @@ export default function EditorPage() {
     try {
       setIsSavingMeta(true);
       const updated = await updateTest(id, payload);
-      setTest(updated);
+      setTest((prev) =>
+        prev
+          ? {
+              ...prev,
+              // обновляем только мета-поля, не трогаем вопросы и ответы
+              title: updated.title,
+              desc: updated.desc,
+              is_active: updated.is_active,
+              start_at: updated.start_at,
+              end_at: updated.end_at,
+              duration: updated.duration,
+            }
+          : prev,
+      );
     } catch (err: any) {
       const message = err?.response?.data?.message ?? 'Не удалось сохранить изменения теста.';
       setError(message);
