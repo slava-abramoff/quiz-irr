@@ -530,13 +530,6 @@ export default function EditorPage() {
                 <h2 className="text-sm font-semibold text-gray-900">
                   Вопросы и ответы
                 </h2>
-                <button
-                  type="button"
-                  onClick={handleAddQuestion}
-                  className="inline-flex items-center rounded-md bg-gray-900 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-gray-800"
-                >
-                  + Добавить вопрос
-                </button>
               </div>
 
               {questions.length === 0 ? (
@@ -553,9 +546,6 @@ export default function EditorPage() {
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 space-y-2">
                           <div className="flex items-center gap-2">
-                            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-900 text-[11px] font-semibold text-white">
-                              {question.id}
-                            </span>
                             <input
                               type="text"
                               value={question.text}
@@ -682,6 +672,16 @@ export default function EditorPage() {
                   ))}
                 </div>
               )}
+
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={handleAddQuestion}
+                  className="inline-flex items-center rounded-md bg-gray-900 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-gray-800"
+                >
+                  + Добавить вопрос
+                </button>
+              </div>
             </section>
           </>
         )}

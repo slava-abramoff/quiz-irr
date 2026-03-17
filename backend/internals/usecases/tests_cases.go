@@ -172,6 +172,7 @@ func (t *testsCases) GetTestFullData(
 		IsActive: test.IsActive,
 		StartAt:  startAt,
 		EndAt:    endAt,
+		Duration: test.Duration,
 		Author:   test.Author.FullName,
 	}
 
