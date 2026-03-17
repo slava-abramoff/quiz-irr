@@ -75,6 +75,8 @@ func main() {
 		log.Println("Root Email: ", root.Email)
 	}
 
+	router := middlewares.CorsMiddleware(r)
+
 	log.Println("Server Started...")
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Fatal(http.ListenAndServe(":8080", router))
 }

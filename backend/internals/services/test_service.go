@@ -55,6 +55,10 @@ func (t *testService) GetByID(ctx context.Context, id uuid.UUID) (*models.Test, 
 }
 
 func (t *testService) FindMany(ctx context.Context, skip, take uint) ([]models.Test, *dto.Pagination, error) {
+	if take == 0 {
+		take = 1
+	}
+
 	tests, count, err := t.storage.FindMany(ctx, skip, take)
 	if err != nil {
 		return tests, nil, err
@@ -95,11 +99,15 @@ func (t *testService) Update(ctx context.Context, id uuid.UUID, data dto.UpdateT
 	}
 
 	if data.StartAt != nil {
-		updated["start_at"] = *data.StartAt
+		if parsed, err := time.Parse("2006-01-02 15:04:05", *data.StartAt); err == nil {
+			updated["start_at"] = parsed
+		}
 	}
 
 	if data.EndAt != nil {
-		updated["title"] = *data.Title
+		if parsed, err := time.Parse("2006-01-02 15:04:05", *data.EndAt); err == nil {
+			updated["end_at"] = parsed
+		}
 	}
 
 	return t.storage.Update(ctx, id, updated)

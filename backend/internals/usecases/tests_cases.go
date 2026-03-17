@@ -59,13 +59,21 @@ func (t *testsCases) NewTest(
 		return nil, err
 	}
 
+	var startAt, endAt string
+	if test.StartAt != nil {
+		startAt = test.StartAt.Format("2006-01-02 15:04:05")
+	}
+	if test.EndAt != nil {
+		endAt = test.EndAt.Format("2006-01-02 15:04:05")
+	}
+
 	return &dto.TestAdminResponse{
 		ID:       test.ID.String(),
 		Title:    test.Title,
 		Desc:     test.Desc,
 		IsActive: test.IsActive,
-		StartAt:  test.StartAt.Format("2006-01-02 15:04:05"),
-		EndAt:    test.EndAt.Format("2006-01-02 15:04:05"),
+		StartAt:  startAt,
+		EndAt:    endAt,
 		Author:   test.Author.FullName,
 	}, nil
 }
@@ -80,13 +88,22 @@ func (t *testsCases) GetTestPreview(
 		return nil, err
 	}
 
+	var startAt, endAt string
+	if test.StartAt != nil {
+		startAt = test.StartAt.Format("2006-01-02 15:04:05")
+	}
+	if test.EndAt != nil {
+		endAt = test.EndAt.Format("2006-01-02 15:04:05")
+	}
+
 	return &dto.TestAdminResponse{
 		ID:       test.ID.String(),
 		Title:    test.Title,
 		Desc:     test.Desc,
 		IsActive: test.IsActive,
-		StartAt:  test.StartAt.Format("2006-01-02 15:04:05"),
-		EndAt:    test.EndAt.Format("2006-01-02 15:04:05"),
+		StartAt:  startAt,
+		EndAt:    endAt,
+		Duration: test.Duration,
 		Author:   test.Author.FullName,
 	}, nil
 }
@@ -100,13 +117,21 @@ func (t *testsCases) FindManyTests(ctx context.Context, skip, take uint) (*dto.G
 	testDtos := make([]dto.TestAdminResponse, 0, take)
 
 	for _, test := range tests {
+		var startAt, endAt string
+		if test.StartAt != nil {
+			startAt = test.StartAt.Format("2006-01-02 15:04:05")
+		}
+		if test.EndAt != nil {
+			endAt = test.EndAt.Format("2006-01-02 15:04:05")
+		}
+
 		testDto := dto.TestAdminResponse{
 			ID:       test.ID.String(),
 			Title:    test.Title,
 			Desc:     test.Desc,
 			IsActive: test.IsActive,
-			StartAt:  test.StartAt.Format("2006-01-02 15:04:05"),
-			EndAt:    test.EndAt.Format("2006-01-02 15:04:05"),
+			StartAt:  startAt,
+			EndAt:    endAt,
 			Author:   test.Author.FullName,
 			Duration: test.Duration,
 		}
@@ -132,13 +157,21 @@ func (t *testsCases) GetTestFullData(
 		return nil, err
 	}
 
+	var startAt, endAt string
+	if test.StartAt != nil {
+		startAt = test.StartAt.Format("2006-01-02 15:04:05")
+	}
+	if test.EndAt != nil {
+		endAt = test.EndAt.Format("2006-01-02 15:04:05")
+	}
+
 	testData = dto.TestAdminResponse{
 		ID:       test.ID.String(),
 		Title:    test.Title,
 		Desc:     test.Desc,
 		IsActive: test.IsActive,
-		StartAt:  test.StartAt.Format("2006-01-02 15:04:05"),
-		EndAt:    test.EndAt.Format("2006-01-02 15:04:05"),
+		StartAt:  startAt,
+		EndAt:    endAt,
 		Author:   test.Author.FullName,
 	}
 

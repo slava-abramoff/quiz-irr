@@ -1,0 +1,432 @@
+[2026-03-17T20:05:40.063Z] Flow test started. BASE_URL=http://localhost:8080
+[2026-03-17T20:05:40.065Z] 
+[2026-03-17T20:05:40.065Z] ============================================================
+1. LOGIN
+============================================================
+[2026-03-17T20:05:40.065Z] >>> REQUEST: POST http://localhost:8080/api/auth/login
+[2026-03-17T20:05:40.065Z] >>> BODY: {
+  "email": "vyachik005@gmail.com",
+  "password": "changeme"
+}
+[2026-03-17T20:05:40.146Z] <<< STATUS: 200
+[2026-03-17T20:05:40.146Z] <<< RESPONSE: {
+  "full_name": "Абрамов Вячеслав Александрович",
+  "email": "vyachik005@gmail.com",
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InZ5YWNoaWswMDVAZ21haWwuY29tIiwiZXhwIjoxNzczNzc4ODQwLCJpZCI6MSwiaXNfcm9vdCI6dHJ1ZX0.WqBiPi40qmO7VtZh9cdCE0SRPSEbDtIDxiH11DNGlB0",
+  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzQzODI3NDAsImlkIjoxfQ.wJLPjCK-9y9FW5Q7akX7uv-d-2leDd5uK5kRWTqsqGo"
+}
+[2026-03-17T20:05:40.146Z] 
+[2026-03-17T20:05:40.147Z] ============================================================
+2. CREATE TEST
+============================================================
+[2026-03-17T20:05:40.147Z] >>> REQUEST: POST http://localhost:8080/api/tests/init
+[2026-03-17T20:05:40.147Z] >>> BODY: {
+  "title": "Flow Test Quiz",
+  "desc": "Created by flow-test.js"
+}
+[2026-03-17T20:05:40.187Z] <<< STATUS: 200
+[2026-03-17T20:05:40.187Z] <<< RESPONSE: {
+  "id": "d04f97f4-9e1b-4c63-8b2d-ad3d81d8fd81",
+  "title": "Flow Test Quiz",
+  "desc": "Created by flow-test.js",
+  "is_active": false,
+  "start_at": "2026-03-17 23:05:40",
+  "end_at": "2026-03-17 23:05:40",
+  "author": "",
+  "duration": 0,
+  "questions": null
+}
+[2026-03-17T20:05:40.187Z] 
+[2026-03-17T20:05:40.187Z] ============================================================
+3. ADD QUESTIONS
+============================================================
+[2026-03-17T20:05:40.187Z] >>> REQUEST: POST http://localhost:8080/api/questions/test/d04f97f4-9e1b-4c63-8b2d-ad3d81d8fd81
+[2026-03-17T20:05:40.222Z] <<< STATUS: 200
+[2026-03-17T20:05:40.222Z] <<< RESPONSE: {
+  "id": 13,
+  "text": "Сотрите текст и напишите свой вопрос",
+  "type": "multiple",
+  "points": 1,
+  "options": null
+}
+[2026-03-17T20:05:40.222Z] >>> REQUEST: PATCH http://localhost:8080/api/questions/13
+[2026-03-17T20:05:40.222Z] >>> BODY: {
+  "text": "Сколько будет 2+2?",
+  "type": "single",
+  "points": 5
+}
+[2026-03-17T20:05:40.225Z] <<< STATUS: 200
+[2026-03-17T20:05:40.225Z] <<< RESPONSE: {
+  "id": 13,
+  "text": "Сколько будет 2+2?",
+  "type": "single",
+  "points": 5,
+  "options": []
+}
+[2026-03-17T20:05:40.225Z] >>> REQUEST: POST http://localhost:8080/api/questions/test/d04f97f4-9e1b-4c63-8b2d-ad3d81d8fd81
+[2026-03-17T20:05:40.227Z] <<< STATUS: 200
+[2026-03-17T20:05:40.228Z] <<< RESPONSE: {
+  "id": 14,
+  "text": "Сотрите текст и напишите свой вопрос",
+  "type": "multiple",
+  "points": 1,
+  "options": null
+}
+[2026-03-17T20:05:40.228Z] >>> REQUEST: PATCH http://localhost:8080/api/questions/14
+[2026-03-17T20:05:40.228Z] >>> BODY: {
+  "text": "Выберите чётные числа",
+  "type": "multiple",
+  "points": 10
+}
+[2026-03-17T20:05:40.230Z] <<< STATUS: 200
+[2026-03-17T20:05:40.230Z] <<< RESPONSE: {
+  "id": 14,
+  "text": "Выберите чётные числа",
+  "type": "multiple",
+  "points": 10,
+  "options": []
+}
+[2026-03-17T20:05:40.230Z] 
+[2026-03-17T20:05:40.230Z] ============================================================
+4. ADD OPTIONS
+============================================================
+[2026-03-17T20:05:40.230Z] >>> REQUEST: POST http://localhost:8080/api/options/question/13
+[2026-03-17T20:05:40.232Z] <<< STATUS: 200
+[2026-03-17T20:05:40.232Z] <<< RESPONSE: {
+  "id": 37,
+  "text": "Новый ответ",
+  "is_correct": false
+}
+[2026-03-17T20:05:40.232Z] >>> REQUEST: PATCH http://localhost:8080/api/options/37
+[2026-03-17T20:05:40.232Z] >>> BODY: {
+  "text": "3",
+  "is_correct": false
+}
+[2026-03-17T20:05:40.235Z] <<< STATUS: 200
+[2026-03-17T20:05:40.235Z] <<< RESPONSE: {
+  "id": 37,
+  "text": "3",
+  "is_correct": false
+}
+[2026-03-17T20:05:40.235Z] >>> REQUEST: POST http://localhost:8080/api/options/question/13
+[2026-03-17T20:05:40.236Z] <<< STATUS: 200
+[2026-03-17T20:05:40.236Z] <<< RESPONSE: {
+  "id": 38,
+  "text": "Новый ответ",
+  "is_correct": false
+}
+[2026-03-17T20:05:40.237Z] >>> REQUEST: PATCH http://localhost:8080/api/options/38
+[2026-03-17T20:05:40.237Z] >>> BODY: {
+  "text": "4",
+  "is_correct": true
+}
+[2026-03-17T20:05:40.239Z] <<< STATUS: 200
+[2026-03-17T20:05:40.239Z] <<< RESPONSE: {
+  "id": 38,
+  "text": "4",
+  "is_correct": true
+}
+[2026-03-17T20:05:40.239Z] >>> REQUEST: POST http://localhost:8080/api/options/question/13
+[2026-03-17T20:05:40.240Z] <<< STATUS: 200
+[2026-03-17T20:05:40.240Z] <<< RESPONSE: {
+  "id": 39,
+  "text": "Новый ответ",
+  "is_correct": false
+}
+[2026-03-17T20:05:40.240Z] >>> REQUEST: PATCH http://localhost:8080/api/options/39
+[2026-03-17T20:05:40.240Z] >>> BODY: {
+  "text": "5",
+  "is_correct": false
+}
+[2026-03-17T20:05:40.242Z] <<< STATUS: 200
+[2026-03-17T20:05:40.242Z] <<< RESPONSE: {
+  "id": 39,
+  "text": "5",
+  "is_correct": false
+}
+[2026-03-17T20:05:40.242Z] >>> REQUEST: POST http://localhost:8080/api/options/question/14
+[2026-03-17T20:05:40.244Z] <<< STATUS: 200
+[2026-03-17T20:05:40.244Z] <<< RESPONSE: {
+  "id": 40,
+  "text": "Новый ответ",
+  "is_correct": false
+}
+[2026-03-17T20:05:40.244Z] >>> REQUEST: PATCH http://localhost:8080/api/options/40
+[2026-03-17T20:05:40.244Z] >>> BODY: {
+  "text": "2",
+  "is_correct": true
+}
+[2026-03-17T20:05:40.246Z] <<< STATUS: 200
+[2026-03-17T20:05:40.246Z] <<< RESPONSE: {
+  "id": 40,
+  "text": "2",
+  "is_correct": true
+}
+[2026-03-17T20:05:40.246Z] >>> REQUEST: POST http://localhost:8080/api/options/question/14
+[2026-03-17T20:05:40.248Z] <<< STATUS: 200
+[2026-03-17T20:05:40.248Z] <<< RESPONSE: {
+  "id": 41,
+  "text": "Новый ответ",
+  "is_correct": false
+}
+[2026-03-17T20:05:40.248Z] >>> REQUEST: PATCH http://localhost:8080/api/options/41
+[2026-03-17T20:05:40.248Z] >>> BODY: {
+  "text": "3",
+  "is_correct": false
+}
+[2026-03-17T20:05:40.250Z] <<< STATUS: 200
+[2026-03-17T20:05:40.250Z] <<< RESPONSE: {
+  "id": 41,
+  "text": "3",
+  "is_correct": false
+}
+[2026-03-17T20:05:40.250Z] >>> REQUEST: POST http://localhost:8080/api/options/question/14
+[2026-03-17T20:05:40.251Z] <<< STATUS: 200
+[2026-03-17T20:05:40.251Z] <<< RESPONSE: {
+  "id": 42,
+  "text": "Новый ответ",
+  "is_correct": false
+}
+[2026-03-17T20:05:40.251Z] >>> REQUEST: PATCH http://localhost:8080/api/options/42
+[2026-03-17T20:05:40.252Z] >>> BODY: {
+  "text": "4",
+  "is_correct": true
+}
+[2026-03-17T20:05:40.253Z] <<< STATUS: 200
+[2026-03-17T20:05:40.253Z] <<< RESPONSE: {
+  "id": 42,
+  "text": "4",
+  "is_correct": true
+}
+[2026-03-17T20:05:40.253Z] 
+[2026-03-17T20:05:40.253Z] ============================================================
+5a. EXAM INFO (is_active = false)
+============================================================
+[2026-03-17T20:05:40.253Z] >>> REQUEST: GET http://localhost:8080/api/exam/info/d04f97f4-9e1b-4c63-8b2d-ad3d81d8fd81
+[2026-03-17T20:05:40.254Z] <<< STATUS: 500
+[2026-03-17T20:05:40.254Z] <<< RESPONSE: {
+  "message": "Error",
+  "status": "error"
+}
+[2026-03-17T20:05:40.254Z] 
+[2026-03-17T20:05:40.254Z] ============================================================
+5b. START EXAM (is_active = false)
+============================================================
+[2026-03-17T20:05:40.254Z] >>> REQUEST: POST http://localhost:8080/api/exam/start/d04f97f4-9e1b-4c63-8b2d-ad3d81d8fd81
+[2026-03-17T20:05:40.254Z] >>> BODY: {
+  "test_id": "d04f97f4-9e1b-4c63-8b2d-ad3d81d8fd81",
+  "full_name": "Иван Тестов",
+  "email": "ivan@test.local",
+  "org": "Flow Test Org"
+}
+[2026-03-17T20:05:40.257Z] <<< STATUS: 200
+[2026-03-17T20:05:40.257Z] <<< RESPONSE: {
+  "raw_id": "29765d6e-5aba-4bc5-a613-1a48d733cf48",
+  "questions": [
+    {
+      "id": 13,
+      "text": "Сколько будет 2+2?",
+      "type": "single",
+      "options": [
+        {
+          "id": 37,
+          "text": "3"
+        },
+        {
+          "id": 38,
+          "text": "4"
+        },
+        {
+          "id": 39,
+          "text": "5"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "text": "Выберите чётные числа",
+      "type": "multiple",
+      "options": [
+        {
+          "id": 40,
+          "text": "2"
+        },
+        {
+          "id": 41,
+          "text": "3"
+        },
+        {
+          "id": 42,
+          "text": "4"
+        }
+      ]
+    }
+  ]
+}
+[2026-03-17T20:05:40.257Z] 
+[2026-03-17T20:05:40.257Z] ============================================================
+5c. PATCH TEST is_active = true
+============================================================
+[2026-03-17T20:05:40.257Z] >>> REQUEST: PATCH http://localhost:8080/api/tests/d04f97f4-9e1b-4c63-8b2d-ad3d81d8fd81
+[2026-03-17T20:05:40.257Z] >>> BODY: {
+  "is_active": true
+}
+[2026-03-17T20:05:40.259Z] <<< STATUS: 200
+[2026-03-17T20:05:40.259Z] <<< RESPONSE: {
+  "id": "d04f97f4-9e1b-4c63-8b2d-ad3d81d8fd81",
+  "title": "Flow Test Quiz",
+  "desc": "Created by flow-test.js",
+  "is_active": true,
+  "start_at": "2026-03-17 23:05:40",
+  "end_at": "2026-03-17 23:05:40",
+  "author": "Абрамов Вячеслав Александрович",
+  "duration": 0,
+  "questions": null
+}
+[2026-03-17T20:05:40.259Z] 
+[2026-03-17T20:05:40.259Z] ============================================================
+6. EXAM INFO (is_active = true)
+============================================================
+[2026-03-17T20:05:40.259Z] >>> REQUEST: GET http://localhost:8080/api/exam/info/d04f97f4-9e1b-4c63-8b2d-ad3d81d8fd81
+[2026-03-17T20:05:40.260Z] <<< STATUS: 200
+[2026-03-17T20:05:40.260Z] <<< RESPONSE: {
+  "title": "Flow Test Quiz",
+  "desc": "Created by flow-test.js",
+  "duration": 0,
+  "start_at": "2026-03-17 23:05:40",
+  "end_at": "2026-03-17 23:05:40"
+}
+[2026-03-17T20:05:40.260Z] 
+[2026-03-17T20:05:40.260Z] ============================================================
+7. START EXAM (is_active = true)
+============================================================
+[2026-03-17T20:05:40.260Z] >>> REQUEST: POST http://localhost:8080/api/exam/start/d04f97f4-9e1b-4c63-8b2d-ad3d81d8fd81
+[2026-03-17T20:05:40.260Z] >>> BODY: {
+  "test_id": "d04f97f4-9e1b-4c63-8b2d-ad3d81d8fd81",
+  "full_name": "Иван Тестов",
+  "email": "ivan@test.local",
+  "org": "Flow Test Org"
+}
+[2026-03-17T20:05:40.262Z] <<< STATUS: 200
+[2026-03-17T20:05:40.262Z] <<< RESPONSE: {
+  "raw_id": "600f2a81-fde2-4fd2-8213-49dbad635d8d",
+  "questions": [
+    {
+      "id": 13,
+      "text": "Сколько будет 2+2?",
+      "type": "single",
+      "options": [
+        {
+          "id": 37,
+          "text": "3"
+        },
+        {
+          "id": 38,
+          "text": "4"
+        },
+        {
+          "id": 39,
+          "text": "5"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "text": "Выберите чётные числа",
+      "type": "multiple",
+      "options": [
+        {
+          "id": 40,
+          "text": "2"
+        },
+        {
+          "id": 41,
+          "text": "3"
+        },
+        {
+          "id": 42,
+          "text": "4"
+        }
+      ]
+    }
+  ]
+}
+[2026-03-17T20:05:40.262Z] 
+[2026-03-17T20:05:40.262Z] ============================================================
+8. SAVE ANSWERS
+============================================================
+[2026-03-17T20:05:40.262Z] >>> REQUEST: POST http://localhost:8080/api/exam/save/600f2a81-fde2-4fd2-8213-49dbad635d8d
+[2026-03-17T20:05:40.262Z] >>> BODY: {
+  "answers": [
+    {
+      "answer_id": 13,
+      "option_ids": [
+        38
+      ],
+      "text_option": ""
+    },
+    {
+      "answer_id": 14,
+      "option_ids": [
+        40,
+        42
+      ],
+      "text_option": ""
+    }
+  ]
+}
+[2026-03-17T20:05:40.267Z] <<< STATUS: 200
+[2026-03-17T20:05:40.267Z] <<< RESPONSE: {
+  "message": "Ожидайте результатов"
+}
+[2026-03-17T20:05:40.267Z] 
+[2026-03-17T20:05:40.267Z] ============================================================
+9. RAW RESULTS (list by test)
+============================================================
+[2026-03-17T20:05:40.267Z] >>> REQUEST: GET http://localhost:8080/api/raws/test/d04f97f4-9e1b-4c63-8b2d-ad3d81d8fd81?skip=0&take=10
+[2026-03-17T20:05:40.270Z] <<< STATUS: ERR
+[2026-03-17T20:05:40.270Z] <<< RESPONSE: {
+  "error": "fetch failed"
+}
+[2026-03-17T20:05:40.270Z] 
+[2026-03-17T20:05:40.270Z] ============================================================
+10. ANALYZE RAW
+============================================================
+[2026-03-17T20:05:40.270Z] >>> REQUEST: POST http://localhost:8080/api/raws/analyze/600f2a81-fde2-4fd2-8213-49dbad635d8d
+[2026-03-17T20:05:40.273Z] <<< STATUS: 200
+[2026-03-17T20:05:40.273Z] <<< RESPONSE: {
+  "message": "Ответы обработаны, подготовлены результаты"
+}
+[2026-03-17T20:05:40.273Z] 
+[2026-03-17T20:05:40.273Z] ============================================================
+11. RESULTS BY TEST
+============================================================
+[2026-03-17T20:05:40.274Z] >>> REQUEST: GET http://localhost:8080/api/results/test/d04f97f4-9e1b-4c63-8b2d-ad3d81d8fd81?skip=0&take=10
+[2026-03-17T20:05:40.274Z] <<< STATUS: 200
+[2026-03-17T20:05:40.274Z] <<< RESPONSE: {
+  "data": [
+    {
+      "id": 4,
+      "full_name": "Иван Тестов",
+      "email": "ivan@test.local",
+      "org": "Flow Test Org",
+      "duration": 0,
+      "is_on_time": false,
+      "total_score": 15
+    }
+  ],
+  "pagination": {
+    "current_page": 1,
+    "total_pages": 1,
+    "total_items": 1,
+    "items_perpage": 10,
+    "has_next_page": false,
+    "has_previous_page": false
+  }
+}
+[2026-03-17T20:05:40.274Z] Result IDs: 4
+[2026-03-17T20:05:40.275Z] 
+[2026-03-17T20:05:40.275Z] ============================================================
+DONE
+============================================================
+[2026-03-17T20:05:40.275Z] Log written to: /home/slava/dev/quiz-irr/backend/flow-test/flow-test-log.txt
