@@ -99,13 +99,13 @@ func (t *testService) Update(ctx context.Context, id uuid.UUID, data dto.UpdateT
 	}
 
 	if data.StartAt != nil {
-		if parsed, err := time.Parse("2006-01-02 15:04:05", *data.StartAt); err == nil {
+		if parsed, err := time.Parse(time.RFC3339, *data.StartAt); err == nil {
 			updated["start_at"] = parsed
 		}
 	}
 
 	if data.EndAt != nil {
-		if parsed, err := time.Parse("2006-01-02 15:04:05", *data.EndAt); err == nil {
+		if parsed, err := time.Parse(time.RFC3339, *data.EndAt); err == nil {
 			updated["end_at"] = parsed
 		}
 	}

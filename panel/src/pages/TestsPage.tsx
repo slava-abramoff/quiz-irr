@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getTests, deleteTest, createTest } from '../api/tests';
+import { getTests, createTest } from '../api/tests';
 import type { CreateTestRequest, TestAdminResponse } from '../api/types';
 
 const PAGE_SIZE = 10;
@@ -96,20 +96,6 @@ export default function TestsPage() {
       setCreateError(message);
     } finally {
       setIsCreating(false);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    if (!window.confirm('Удалить тест и все связанные вопросы/результаты?')) {
-      return;
-    }
-
-    try {
-      await deleteTest(id);
-      setTests((prev) => prev.filter((t) => t.id !== id));
-    } catch (err: any) {
-      const message = err?.response?.data?.message ?? 'Не удалось удалить тест.';
-      setError(message);
     }
   };
 
@@ -216,13 +202,6 @@ export default function TestsPage() {
                         className="inline-flex items-center rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
                       >
                         Перейти в тест
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(test.id)}
-                        className="inline-flex items-center rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100"
-                      >
-                        Удалить
                       </button>
                     </div>
                   </li>

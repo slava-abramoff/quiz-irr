@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { deleteTest, getTest, updateTest } from '../api/tests';
+import { getTest, updateTest } from '../api/tests';
 import {
   createQuestion,
   deleteQuestion,
@@ -45,6 +45,48 @@ function hmsToDurationSeconds(
   return h * 3600 + m * 60 + s;
 }
 
+function backendDateTimeToInput(value: string | null | undefined): string {
+  if (!value) return '';
+
+  // Если уже ISO-формат "YYYY-MM-DDTHH:MM[:SS]Z..." — просто приводим к datetime-local
+  if (value.includes('T')) {
+    const iso = value;
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime())) return '';
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+
+  // Старый формат: "YYYY-MM-DD HH:MM:SS"
+  const [datePart, timePart] = value.split(' ');
+  if (!datePart || !timePart) return '';
+  const [hh, mm] = timePart.split(':');
+  if (!hh || !mm) return '';
+  return `${datePart}T${hh}:${mm}`;
+}
+
+function inputDateTimeToBackend(value: string | null | undefined): string | undefined {
+  if (!value) return undefined;
+  // value в формате "YYYY-MM-DDTHH:MM" (локальное время)
+  const [datePart, timePart] = value.split('T');
+  if (!datePart || !timePart) return undefined;
+
+  // Вычисляем текущий часовой пояс клиента
+  const now = new Date();
+  const offsetMinutes = -now.getTimezoneOffset(); // например, +180 для UTC+3
+  const sign = offsetMinutes >= 0 ? '+' : '-';
+  const absMinutes = Math.abs(offsetMinutes);
+  const offsetHoursPart = String(Math.floor(absMinutes / 60)).padStart(2, '0');
+  const offsetMinutesPart = String(absMinutes % 60).padStart(2, '0');
+
+  // Собираем ISO‑подобную строку с явным часовым поясом: "YYYY-MM-DDTHH:MM:00+03:00"
+  return `${datePart}T${timePart}:00${sign}${offsetHoursPart}:${offsetMinutesPart}`;
+}
+
 export default function EditorPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -52,7 +94,6 @@ export default function EditorPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSavingMeta, setIsSavingMeta] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   const [title, setTitle] = useState('');
   const [desc, setDesc] = useState('');
@@ -92,8 +133,8 @@ export default function EditorPage() {
 
         setTitle(data.title);
         setDesc(data.desc);
-        setStartAt(data.start_at);
-        setEndAt(data.end_at);
+        setStartAt(backendDateTimeToInput(data.start_at));
+        setEndAt(backendDateTimeToInput(data.end_at));
         setIsActive(data.is_active);
         const { hours, minutes, seconds } = parseDurationToHMS(data.duration);
         setDurationHours(hours);
@@ -123,8 +164,8 @@ export default function EditorPage() {
       title: title.trim() || undefined,
       desc: desc.trim() || undefined,
       is_active: isActive,
-      start_at: startAt || undefined,
-      end_at: endAt || undefined,
+      start_at: inputDateTimeToBackend(startAt),
+      end_at: inputDateTimeToBackend(endAt),
       duration: hmsToDurationSeconds(durationHours, durationMinutes, durationSeconds),
     };
 
@@ -150,28 +191,6 @@ export default function EditorPage() {
       setError(message);
     } finally {
       setIsSavingMeta(false);
-    }
-  };
-
-  const handleDeleteTest = async () => {
-    if (!id) return;
-    if (
-      !window.confirm(
-        'Удалить тест и все связанные вопросы, результаты и ответы? Это действие необратимо.',
-      )
-    ) {
-      return;
-    }
-
-    try {
-      setIsDeleting(true);
-      await deleteTest(id);
-      navigate('/', { replace: true });
-    } catch (err: any) {
-      const message = err?.response?.data?.message ?? 'Не удалось удалить тест.';
-      setError(message);
-    } finally {
-      setIsDeleting(false);
     }
   };
 
@@ -370,14 +389,7 @@ export default function EditorPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={handleDeleteTest}
-              disabled={isDeleting}
-              className="inline-flex items-center rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {isDeleting ? 'Удаляем...' : 'Удалить тест'}
-            </button>
+            {/* здесь позже можно добавить элементы управления пользователем */}
           </div>
         </div>
       </header>
@@ -461,15 +473,14 @@ export default function EditorPage() {
                       htmlFor="test-start-at"
                       className="block text-xs font-medium text-gray-700"
                     >
-                      Начало тестирования (строка)
+                      Начало тестирования
                     </label>
                     <input
                       id="test-start-at"
-                      type="text"
+                      type="datetime-local"
                       value={startAt}
                       onChange={(event) => setStartAt(event.target.value)}
                       className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                      placeholder="2026-03-17 15:04:05"
                     />
                   </div>
 
@@ -478,15 +489,14 @@ export default function EditorPage() {
                       htmlFor="test-end-at"
                       className="block text-xs font-medium text-gray-700"
                     >
-                      Окончание тестирования (строка)
+                      Окончание тестирования
                     </label>
                     <input
                       id="test-end-at"
-                      type="text"
+                      type="datetime-local"
                       value={endAt}
                       onChange={(event) => setEndAt(event.target.value)}
                       className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                      placeholder="2026-03-17 16:04:05"
                     />
                   </div>
 
