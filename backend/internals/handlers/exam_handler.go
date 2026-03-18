@@ -64,6 +64,21 @@ func (e *ExamHandlers) StartTest(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 
+	if req.Email == "" || len([]byte(req.Email)) > 30 {
+		httpresponse.ErrorResponse(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+
+	if req.FullName == "" || len([]byte(req.FullName)) > 75 {
+		httpresponse.ErrorResponse(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+
+	if req.Org == "" || len([]byte(req.Org)) > 75 {
+		httpresponse.ErrorResponse(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+
 	testBody, err := e.exam.StartTest(ctx, testId, req)
 	if err != nil {
 		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)

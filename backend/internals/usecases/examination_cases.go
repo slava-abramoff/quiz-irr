@@ -65,6 +65,17 @@ func (e *examCases) GetTestInfo(ctx context.Context, id uuid.UUID) (*dto.TestCus
 }
 
 func (e *examCases) StartTest(ctx context.Context, id uuid.UUID, data dto.StartExamRequest) (*dto.StartExamResponse, error) {
+	test, err := e.testService.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	if test.StartAt != nil && test.EndAt != nil {
+		if !e.isTimeToStart(*test.StartAt, *test.EndAt) {
+			return nil, errors.New("action is not available at this time")
+		}
+	}
+
 	// TODO: опрашивать кэш
 	questions, err := e.questionService.GetByTestID(ctx, id)
 	if err != nil {
