@@ -1,7 +1,6 @@
 package dto
 
 type StartExamRequest struct {
-	TestID   string `json:"test_id"`
 	FullName string `json:"full_name"`
 	Email    string `json:"email"`
 	Org      string `json:"org"`
