@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"quiz-irr/internals/handlers/dto"
 	"quiz-irr/internals/storage/models"
 	"time"
@@ -46,8 +47,10 @@ func (a *authService) MakeAccessToken(admin *models.Admin) (string, error) {
 
 func (a *authService) MakeRefreshToken(admin *models.Admin) (string, error) {
 	claims := jwt.MapClaims{
-		"id":  admin.ID,
-		"exp": time.Now().Add(7 * 24 * time.Hour).Unix(),
+		"id":       admin.ID,
+		"email":    admin.Email,
+		"is_root":  admin.IsRoot,
+		"exp":      time.Now().Add(7 * 24 * time.Hour).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -65,14 +68,27 @@ func (a *authService) RefreshAccessToken(refreshToken string) (string, error) {
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok || !token.Valid {
-		return "", err
+		return "", fmt.Errorf("invalid token")
 	}
 
-	adminID := uint(claims["id"].(float64))
+	idRaw, ok := claims["id"]
+	if !ok {
+		return "", fmt.Errorf("missing id claim")
+	}
+	idFloat, ok := idRaw.(float64)
+	if !ok {
+		return "", fmt.Errorf("invalid id claim type")
+	}
+
+	// Backward-compatible: older refresh tokens might not include these claims.
+	email, _ := claims["email"].(string)
+	isRoot, _ := claims["is_root"].(bool)
 
 	newClaims := jwt.MapClaims{
-		"id":  adminID,
-		"exp": time.Now().Add(15 * time.Minute).Unix(),
+		"id":      uint(idFloat),
+		"email":   email,
+		"is_root": isRoot,
+		"exp":     time.Now().Add(15 * time.Minute).Unix(),
 	}
 
 	newToken := jwt.NewWithClaims(jwt.SigningMethodHS256, newClaims)
@@ -90,13 +106,26 @@ func (a *authService) GetPayload(tokenString string) (*dto.TokenPayload, error) 
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok || !token.Valid {
-		return nil, err
+		return nil, fmt.Errorf("invalid token")
 	}
 
+	idRaw, ok := claims["id"]
+	if !ok {
+		return nil, fmt.Errorf("missing id claim")
+	}
+	idFloat, ok := idRaw.(float64)
+	if !ok {
+		return nil, fmt.Errorf("invalid id claim type")
+	}
+
+	// Backward-compatible: older tokens might not include all claims.
+	email, _ := claims["email"].(string)
+	isRoot, _ := claims["is_root"].(bool)
+
 	payload := &dto.TokenPayload{
-		ID:     uint(claims["id"].(float64)),
-		Email:  claims["email"].(string),
-		IsRoot: claims["is_root"].(bool),
+		ID:     uint(idFloat),
+		Email:  email,
+		IsRoot: isRoot,
 	}
 
 	return payload, nil
