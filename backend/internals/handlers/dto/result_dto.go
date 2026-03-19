@@ -1,5 +1,7 @@
 package dto
 
+import "github.com/google/uuid"
+
 type ResultReponse struct {
 	ID         uint   `json:"id"`
 	FullName   string `json:"full_name"`
@@ -13,4 +15,14 @@ type ResultReponse struct {
 type ResultsReponse struct {
 	Data       []ResultReponse `json:"data"`
 	Pagination Pagination      `json:"pagination"`
+}
+
+type CreateResult struct {
+	TestID     uuid.UUID
+	FullName   string
+	Email      string
+	Org        string
+	Duration   uint
+	TotalScore int
+	IsOnTime   bool
 }

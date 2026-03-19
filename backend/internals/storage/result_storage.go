@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"quiz-irr/internals/handlers/dto"
 	"quiz-irr/internals/storage/models"
 
 	"github.com/google/uuid"
@@ -41,6 +42,32 @@ func (r *resultRepo) Create(
 	}
 
 	return result, nil
+}
+
+func (r *resultRepo) CreateMany(ctx context.Context, results []dto.CreateResult) error {
+	if len(results) == 0 {
+		return nil
+	}
+
+	records := make([]models.TestResult, 0, len(results))
+
+	for _, res := range results {
+		records = append(records, models.TestResult{
+			TestID:     res.TestID,
+			FullName:   res.FullName,
+			Email:      res.Email,
+			Org:        res.Org,
+			Duration:   res.Duration,
+			TotalScore: res.TotalScore,
+			IsOnTime:   res.IsOnTime,
+		})
+	}
+
+	if err := r.db.WithContext(ctx).Create(&records).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *resultRepo) GetByID(

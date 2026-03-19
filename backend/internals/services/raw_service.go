@@ -19,6 +19,10 @@ type RawStorage interface {
 		start time.Time,
 	) (*models.RawSubmission, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*models.RawSubmission, error)
+	GetAllByTest(
+		ctx context.Context,
+		testId uuid.UUID,
+	) ([]models.RawSubmission, error)
 	GetByTestID(ctx context.Context, testId uuid.UUID, skip, take uint) ([]models.RawSubmission, uint, error)
 	SavePayload(
 		ctx context.Context,
@@ -53,6 +57,13 @@ func (rd *rawService) GetByID(ctx context.Context, id uuid.UUID) (*models.RawSub
 	return rd.storage.GetByID(ctx, id)
 }
 
+func (rd *rawService) GetAllByTest(
+	ctx context.Context,
+	testId uuid.UUID,
+) ([]models.RawSubmission, error) {
+	return rd.storage.GetAllByTest(ctx, testId)
+}
+
 func (rd *rawService) GetByTestID(ctx context.Context, testId uuid.UUID, skip, take uint) ([]models.RawSubmission, *dto.Pagination, error) {
 	raws, count, err := rd.storage.GetByTestID(ctx, testId, skip, take)
 	if err != nil {
@@ -72,6 +83,53 @@ func (rd *rawService) GetByTestID(ctx context.Context, testId uuid.UUID, skip, t
 	}
 
 	return raws, pagination, nil
+}
+
+func (rd *rawService) Update(ctx context.Context, id uuid.UUID, data dto.RawUpdateRequest) (*models.RawSubmission, error) {
+	updated := make(map[string]any)
+
+	if data.FullName != nil {
+		updated["full_name"] = *data.FullName
+	}
+	if data.Email != nil {
+		updated["email"] = *data.Email
+	}
+	if data.Org != nil {
+		updated["org"] = *data.Org
+	}
+	if data.Status != nil {
+		updated["status"] = *data.Status
+	}
+
+	// Accept both UI-friendly and RFC3339 timestamps.
+	if data.StartAt != nil && *data.StartAt != "" {
+		if t, err := time.ParseInLocation("2006-01-02 15:04:05", *data.StartAt, time.Local); err == nil {
+			tt := t
+			updated["start_at"] = &tt
+		} else if t, err := time.Parse(time.RFC3339, *data.StartAt); err == nil {
+			tt := t
+			updated["start_at"] = &tt
+		} else {
+			return nil, err
+		}
+	}
+	if data.EndAt != nil && *data.EndAt != "" {
+		if t, err := time.ParseInLocation("2006-01-02 15:04:05", *data.EndAt, time.Local); err == nil {
+			tt := t
+			updated["end_at"] = &tt
+		} else if t, err := time.Parse(time.RFC3339, *data.EndAt); err == nil {
+			tt := t
+			updated["end_at"] = &tt
+		} else {
+			return nil, err
+		}
+	}
+
+	if len(updated) == 0 {
+		return rd.storage.GetByID(ctx, id)
+	}
+
+	return rd.storage.Update(ctx, id, updated)
 }
 
 func (rd *rawService) SavePayload(ctx context.Context, id uuid.UUID, data dto.SendUserAnswersRequest) (*models.RawSubmission, error) {

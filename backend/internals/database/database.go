@@ -2,10 +2,12 @@ package database
 
 import (
 	"fmt"
+	"os"
 	"quiz-irr/internals/storage/models"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 // cfg *config.Database
@@ -30,7 +32,23 @@ func ConnectDB() (*gorm.DB, error) {
 		5432,
 	)
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	// Default to silent to avoid noisy SQL logs in console.
+	// Override with GORM_LOG_LEVEL: silent|error|warn|info
+	logLevel := logger.Silent
+	switch os.Getenv("GORM_LOG_LEVEL") {
+	case "info":
+		logLevel = logger.Info
+	case "warn":
+		logLevel = logger.Warn
+	case "error":
+		logLevel = logger.Error
+	case "silent", "":
+		logLevel = logger.Silent
+	}
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logLevel),
+	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %v", err)
 	}

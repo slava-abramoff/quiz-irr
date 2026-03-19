@@ -9,6 +9,7 @@ import (
 )
 
 type ResultStorageProvider interface {
+	CreateMany(ctx context.Context, results []dto.CreateResult) error
 	Create(
 		ctx context.Context,
 		testId uuid.UUID,
@@ -53,6 +54,10 @@ type resultsService struct {
 
 func NewResultsService(r ResultStorageProvider) *resultsService {
 	return &resultsService{storage: r}
+}
+
+func (r *resultsService) CreateMany(ctx context.Context, results []dto.CreateResult) error {
+	return r.storage.CreateMany(ctx, results)
 }
 
 func (r *resultsService) Create(

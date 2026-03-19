@@ -54,6 +54,26 @@ func (r *rawRepo) GetByID(ctx context.Context, id uuid.UUID) (*models.RawSubmiss
 	return &sub, nil
 }
 
+func (r *rawRepo) GetAllByTest(
+	ctx context.Context,
+	testId uuid.UUID,
+) ([]models.RawSubmission, error) {
+	var subs []models.RawSubmission
+
+	err := r.db.WithContext(ctx).
+		Preload("Test").
+		Where("test_id = ?", testId).
+		Order("created_at DESC").
+		Find(&subs).
+		Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return subs, nil
+}
+
 func (r *rawRepo) GetByTestID(ctx context.Context, testId uuid.UUID, skip, take uint) ([]models.RawSubmission, uint, error) {
 	var (
 		subs  []models.RawSubmission

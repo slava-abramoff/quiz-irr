@@ -14,6 +14,15 @@ type Answer struct {
 	Text      string `json:"text_option"`
 }
 
+type RawUpdateRequest struct {
+	FullName *string `json:"full_name"`
+	Email    *string `json:"email"`
+	Org      *string `json:"org"`
+	Status   *string `json:"status"`
+	StartAt  *string `json:"start_at"`
+	EndAt    *string `json:"end_at"`
+}
+
 type RawInfoResponse struct {
 	ID       string `json:"id"`
 	FullName string `json:"full_name"`

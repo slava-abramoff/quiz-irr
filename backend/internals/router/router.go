@@ -51,6 +51,7 @@ func NewRouter(
 	router.GET("/api/raws/test/:testId", rw.FindRawResults)
 	router.POST("/api/raws/analyze/:rawId", basicAuth(rw.AnalyzeResults))
 	// POST /api/raws/test/analyze/:testId
+	router.POST("/api/raws/test/analyze/:testId", basicAuth(rw.AnalyzeAllResults))
 	// GET /api/raws/answers/report/:rawId
 	router.DELETE("/api/raws/answers/:rawId", basicAuth(rw.DeleteRawResults))
 	router.DELETE("/api/raws/test/:testId", basicAuth(rw.DeleteAllRawByTest))

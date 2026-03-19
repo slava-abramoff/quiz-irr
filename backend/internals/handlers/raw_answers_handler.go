@@ -15,6 +15,7 @@ import (
 type RawAnswersProvider interface {
 	FindRawResults(ctx context.Context, testId uuid.UUID, skip, take uint) (*dto.RawsInfoResponse, error)
 	AnalyzeResults(ctx context.Context, rawId uuid.UUID) (*dto.Message, error)
+	AnalyzeAllResults(ctx context.Context, testId uuid.UUID) (*dto.Message, error)
 	DeleteRawResults(ctx context.Context, rawId uuid.UUID) (*dto.Message, error)
 	DeleteAllRawByTest(ctx context.Context, testId uuid.UUID) (*dto.Message, error)
 }
@@ -91,6 +92,26 @@ func (rw *RawAnswersHandlers) AnalyzeResults(w http.ResponseWriter, r *http.Requ
 }
 
 // POST /api/raws/analyze/test/:testId
+func (rw *RawAnswersHandlers) AnalyzeAllResults(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	log.Println("start full analyze results")
+	ctx := r.Context()
+
+	id := ps.ByName("testId")
+	testId, err := uuid.Parse(id)
+	if err != nil {
+		httpresponse.ErrorResponse(w, "Invalid test id", http.StatusBadRequest)
+		return
+	}
+
+	msg, err := rw.raw.AnalyzeAllResults(ctx, testId)
+	if err != nil {
+		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)
+		return
+	}
+
+	httpresponse.JsonResponse(w, msg, 200)
+	log.Println("analyze results")
+}
 
 // DELETE /api/raws/:rawId
 func (rw *RawAnswersHandlers) DeleteRawResults(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

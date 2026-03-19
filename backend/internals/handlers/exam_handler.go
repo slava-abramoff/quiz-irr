@@ -108,7 +108,7 @@ func (e *ExamHandlers) SaveAnswers(w http.ResponseWriter, r *http.Request, ps ht
 
 	msg, err := e.exam.SaveAnswers(ctx, rawId, req)
 	if err != nil {
-		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)
+		httpresponse.ErrorResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
