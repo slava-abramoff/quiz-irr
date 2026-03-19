@@ -63,6 +63,7 @@ func (q *questionsRepo) GetByTestID(
 
 	if err := q.db.WithContext(ctx).
 		Where("test_id = ?", testId).
+		Order("id ASC").
 		Find(&questions).Error; err != nil {
 		return nil, err
 	}
