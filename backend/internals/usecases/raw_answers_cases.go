@@ -71,17 +71,31 @@ func (rw *rawAnswersCases) FindRawResults(ctx context.Context, testId uuid.UUID,
 	data := make([]dto.RawInfoResponse, 0, 100)
 
 	for _, raw := range raws {
+		var startAt string
+		if raw.StartAt != nil {
+			startAt = raw.StartAt.Format("2006-01-02 15:04:05")
+		}
+
+		var endAt string
+		if raw.EndAt != nil {
+			endAt = raw.EndAt.Format("2006-01-02 15:04:05")
+		}
+
 		rawDto := dto.RawInfoResponse{
 			ID:       raw.ID.String(),
 			FullName: raw.FullName,
 			Email:    raw.Email,
 			Org:      raw.Org,
 			Status:   raw.Status,
-			StartAt:  raw.StartAt.Format("2006-01-02 15:04:05"),
-			EndAt:    raw.EndAt.Format("2006-01-02 15:04:05"),
+			StartAt:  startAt,
+			EndAt:    endAt,
 		}
 
 		data = append(data, rawDto)
+	}
+
+	if pagination == nil {
+		pagination = &dto.Pagination{}
 	}
 
 	return &dto.RawsInfoResponse{
