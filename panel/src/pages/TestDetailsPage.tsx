@@ -1,7 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { deleteTest, getTestPreview } from "../api/tests";
-import { analyzeRaw, deleteAllRawByTest, deleteRawAnswers, getRawResultsByTest } from "../api/raws";
+import {
+  analyzeAllRawByTest,
+  analyzeRaw,
+  deleteAllRawByTest,
+  deleteRawAnswers,
+  getRawResultsByTest,
+} from "../api/raws";
 import { deleteResult, deleteResultsByTest, getResultsByTest } from "../api/results";
 import type {
   RawsInfoResponse,
@@ -261,17 +267,11 @@ export default function TestDetailsPage() {
   };
 
   const handleAnalyzeAllRaws = async () => {
-    if (!raws?.data?.length) return;
+    if (!id || !raws?.data?.length) return;
     setIsAnalyzingAllRaws(true);
     setRawsError(null);
     try {
-      // Анализируем только те, где status != "started" (кнопки для них активны)
-      const eligible = raws.data.filter((r) => r.status !== "started");
-      for (const item of eligible) {
-        // Последовательно, чтобы не перегружать сервер
-        // eslint-disable-next-line no-await-in-loop
-        await analyzeRaw(item.id);
-      }
+      await analyzeAllRawByTest(id);
       await loadRaws(rawsPage);
     } catch (err: any) {
       const message =
@@ -559,7 +559,7 @@ export default function TestDetailsPage() {
                       disabled={isAnalyzingAllRaws || isLoadingRaws || !rawRows.length}
                       className="inline-flex items-center rounded-md bg-gray-900 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-gray-800 disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      Проверить все
+                      {isAnalyzingAllRaws ? "Проверяем..." : "Проверить все"}
                     </button>
                     <button
                       type="button"

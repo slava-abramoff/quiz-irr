@@ -36,3 +36,12 @@ export async function deleteAllRawByTest(testId: string): Promise<SimpleMessageR
   return data;
 }
 
+export async function analyzeAllRawByTest(
+  testId: string,
+): Promise<SimpleMessageResponse> {
+  const { data } = await api.post<SimpleMessageResponse>(
+    `/raws/test/analyze/${testId}`,
+  );
+  return data;
+}
+
