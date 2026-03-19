@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"quiz-irr/internals/handlers/dto"
+	"quiz-irr/pkg/apperrors"
 	"quiz-irr/pkg/httpresponse"
 	"strconv"
 
@@ -76,7 +77,8 @@ func (t *TestHandlers) NewTest(w http.ResponseWriter, r *http.Request, _ httprou
 
 	test, err := t.tests.NewTest(ctx, id, req)
 	if err != nil {
-		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
 		return
 	}
 
@@ -109,7 +111,8 @@ func (t *TestHandlers) FindManyTests(w http.ResponseWriter, r *http.Request, _ h
 
 	tests, err := t.tests.FindManyTests(ctx, uint(skip), uint(take))
 	if err != nil {
-		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
 		return
 	}
 
@@ -139,7 +142,8 @@ func (t *TestHandlers) GetTest(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	if err != nil {
-		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
 		return
 	}
 
@@ -166,7 +170,8 @@ func (t *TestHandlers) UpdateTest(w http.ResponseWriter, r *http.Request, ps htt
 
 	test, err := t.tests.UpdateTest(ctx, testId, req)
 	if err != nil {
-		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
 		return
 	}
 
@@ -187,7 +192,8 @@ func (t *TestHandlers) DeleteTest(w http.ResponseWriter, r *http.Request, ps htt
 
 	err = t.tests.DeleteTest(ctx, testId)
 	if err != nil {
-		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
 		return
 	}
 
@@ -208,7 +214,8 @@ func (t *TestHandlers) AddQuestion(w http.ResponseWriter, r *http.Request, ps ht
 
 	question, err := t.tests.AddQuestion(ctx, testId)
 	if err != nil {
-		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
 		return
 	}
 
@@ -235,7 +242,8 @@ func (t *TestHandlers) EditQuestion(w http.ResponseWriter, r *http.Request, ps h
 
 	question, err := t.tests.EditQuestion(ctx, uint(questionId), req)
 	if err != nil {
-		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
 		return
 	}
 
@@ -256,7 +264,8 @@ func (t *TestHandlers) DeleteQuestion(w http.ResponseWriter, r *http.Request, ps
 
 	err = t.tests.DeleteQuestion(ctx, uint(questionId))
 	if err != nil {
-		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
 		return
 	}
 
@@ -277,7 +286,8 @@ func (t *TestHandlers) AddOption(w http.ResponseWriter, r *http.Request, ps http
 
 	option, err := t.tests.AddOption(ctx, uint(questionId))
 	if err != nil {
-		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
 		return
 	}
 
@@ -304,7 +314,8 @@ func (t *TestHandlers) EditOption(w http.ResponseWriter, r *http.Request, ps htt
 
 	option, err := t.tests.EditOption(ctx, uint(optionId), req)
 	if err != nil {
-		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
 		return
 	}
 
@@ -325,7 +336,8 @@ func (t *TestHandlers) DeleteOption(w http.ResponseWriter, r *http.Request, ps h
 
 	err = t.tests.DeleteOption(ctx, uint(optionId))
 	if err != nil {
-		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
 		return
 	}
 

@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"quiz-irr/internals/handlers/dto"
+	"quiz-irr/pkg/apperrors"
 	"quiz-irr/pkg/httpresponse"
 	"strconv"
 
@@ -61,7 +62,8 @@ func (rw *RawAnswersHandlers) FindRawResults(w http.ResponseWriter, r *http.Requ
 
 	rawResults, err := rw.raw.FindRawResults(ctx, testId, uint(skip), uint(take))
 	if err != nil {
-		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
 		return
 	}
 
@@ -83,7 +85,8 @@ func (rw *RawAnswersHandlers) AnalyzeResults(w http.ResponseWriter, r *http.Requ
 
 	msg, err := rw.raw.AnalyzeResults(ctx, rawId)
 	if err != nil {
-		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
 		return
 	}
 
@@ -105,7 +108,8 @@ func (rw *RawAnswersHandlers) AnalyzeAllResults(w http.ResponseWriter, r *http.R
 
 	msg, err := rw.raw.AnalyzeAllResults(ctx, testId)
 	if err != nil {
-		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
 		return
 	}
 
@@ -126,7 +130,8 @@ func (rw *RawAnswersHandlers) DeleteRawResults(w http.ResponseWriter, r *http.Re
 
 	msg, err := rw.raw.DeleteRawResults(ctx, rawId)
 	if err != nil {
-		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
 		return
 	}
 
@@ -147,7 +152,8 @@ func (rw *RawAnswersHandlers) DeleteAllRawByTest(w http.ResponseWriter, r *http.
 
 	msg, err := rw.raw.DeleteAllRawByTest(ctx, testId)
 	if err != nil {
-		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
 		return
 	}
 

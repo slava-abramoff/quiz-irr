@@ -2,9 +2,9 @@ package usecases
 
 import (
 	"context"
-	"errors"
 	"quiz-irr/internals/handlers/dto"
 	"quiz-irr/internals/storage/models"
+	"quiz-irr/pkg/apperrors"
 	"time"
 
 	"github.com/google/uuid"
@@ -52,7 +52,7 @@ func (e *examCases) GetTestInfo(ctx context.Context, id uuid.UUID) (*dto.TestCus
 	}
 
 	if !test.IsActive {
-		return nil, errors.New("Not found test")
+		return nil, apperrors.NotFound("Test not found")
 	}
 
 	return &dto.TestCustomerResponse{
@@ -72,7 +72,7 @@ func (e *examCases) StartTest(ctx context.Context, id uuid.UUID, data dto.StartE
 
 	if test.StartAt != nil && test.EndAt != nil {
 		if !e.isTimeToStart(*test.StartAt, *test.EndAt) {
-			return nil, errors.New("action is not available at this time")
+			return nil, apperrors.Conflict("Test is not available at this time")
 		}
 	}
 

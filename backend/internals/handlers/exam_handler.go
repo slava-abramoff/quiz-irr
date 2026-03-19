@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"quiz-irr/internals/handlers/dto"
+	"quiz-irr/pkg/apperrors"
 	"quiz-irr/pkg/httpresponse"
 
 	"github.com/google/uuid"
@@ -39,7 +40,8 @@ func (e *ExamHandlers) GetTestInfo(w http.ResponseWriter, r *http.Request, ps ht
 
 	info, err := e.exam.GetTestInfo(ctx, testId)
 	if err != nil {
-		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
 		return
 	}
 
@@ -81,7 +83,8 @@ func (e *ExamHandlers) StartTest(w http.ResponseWriter, r *http.Request, ps http
 
 	testBody, err := e.exam.StartTest(ctx, testId, req)
 	if err != nil {
-		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
 		return
 	}
 
@@ -108,7 +111,8 @@ func (e *ExamHandlers) SaveAnswers(w http.ResponseWriter, r *http.Request, ps ht
 
 	msg, err := e.exam.SaveAnswers(ctx, rawId, req)
 	if err != nil {
-		httpresponse.ErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
 		return
 	}
 

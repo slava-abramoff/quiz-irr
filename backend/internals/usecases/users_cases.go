@@ -2,11 +2,10 @@ package usecases
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"net/http"
 	"quiz-irr/internals/handlers/dto"
 	"quiz-irr/internals/storage/models"
+	"quiz-irr/pkg/apperrors"
 	"strings"
 )
 
@@ -49,9 +48,12 @@ func (u *usersCases) Login(ctx context.Context, data dto.LoginRequest) (*dto.Log
 	if err != nil {
 		return nil, err
 	}
+	if user == nil {
+		return nil, apperrors.Unauthorized("Invalid credentials")
+	}
 
 	if !u.authService.ComparePassword(user.Password, data.Password) {
-		return nil, errors.New("Invalid password")
+		return nil, apperrors.Unauthorized("Invalid password")
 	}
 
 	access, err := u.authService.MakeAccessToken(user)
@@ -75,7 +77,7 @@ func (u *usersCases) Login(ctx context.Context, data dto.LoginRequest) (*dto.Log
 func (u *usersCases) Refresh(ctx context.Context, data dto.RefreshTokenRequest) (*dto.RefreshTokenResponse, error) {
 	token, err := u.authService.RefreshAccessToken(data.RefreshToken)
 	if err != nil {
-		return nil, err
+		return nil, apperrors.Unauthorized("Invalid or expired refresh token")
 	}
 
 	return &dto.RefreshTokenResponse{
@@ -106,7 +108,7 @@ func (u *usersCases) Update(ctx context.Context, id uint, data dto.UpdateUserReq
 	}
 
 	if oldUser.IsRoot {
-		return nil, fmt.Errorf("Don't permissions for updating root")
+		return nil, apperrors.Forbidden("Cannot update root user")
 	}
 
 	user, err := u.usersSerivce.Update(ctx, id, data)
@@ -129,7 +131,7 @@ func (u *usersCases) Delete(ctx context.Context, id uint) (*dto.UserResponse, er
 	}
 
 	if oldUser.IsRoot {
-		return nil, fmt.Errorf("Don't permissions for delete root")
+		return nil, apperrors.Forbidden("Cannot delete root user")
 	}
 
 	user, err := u.usersSerivce.Delete(ctx, id)

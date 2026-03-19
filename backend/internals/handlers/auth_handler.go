@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"quiz-irr/internals/handlers/dto"
 	"quiz-irr/internals/validator"
+	"quiz-irr/pkg/apperrors"
 	"quiz-irr/pkg/httpresponse"
 
 	"github.com/julienschmidt/httprouter"
@@ -47,7 +48,8 @@ func (a *AuthHandlers) Login(w http.ResponseWriter, r *http.Request, _ httproute
 
 	data, err := a.auth.Login(ctx, req)
 	if err != nil {
-		httpresponse.ErrorResponse(w, "Error", http.StatusFound)
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
 		return
 	}
 
@@ -66,7 +68,8 @@ func (a *AuthHandlers) Refresh(w http.ResponseWriter, r *http.Request, _ httprou
 
 	data, err := a.auth.Refresh(ctx, req)
 	if err != nil {
-		httpresponse.ErrorResponse(w, "Error", http.StatusFound)
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
 		return
 	}
 

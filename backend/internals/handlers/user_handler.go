@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"quiz-irr/internals/handlers/dto"
 	"quiz-irr/internals/validator"
+	"quiz-irr/pkg/apperrors"
 	"quiz-irr/pkg/httpresponse"
 	"strconv"
 
@@ -44,7 +45,8 @@ func (u *UserHandlers) Create(w http.ResponseWriter, r *http.Request, _ httprout
 
 	user, err := u.users.Create(ctx, req)
 	if err != nil {
-		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
 		return
 	}
 
@@ -76,7 +78,8 @@ func (u *UserHandlers) Update(w http.ResponseWriter, r *http.Request, ps httprou
 
 	user, err := u.users.Update(ctx, id, req)
 	if err != nil {
-		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
 		return
 	}
 
@@ -97,7 +100,8 @@ func (u *UserHandlers) Delete(w http.ResponseWriter, r *http.Request, ps httprou
 
 	user, err := u.users.Delete(ctx, id)
 	if err != nil {
-		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
 		return
 	}
 

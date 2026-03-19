@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"quiz-irr/internals/handlers/dto"
+	"quiz-irr/pkg/apperrors"
 	"quiz-irr/pkg/httpresponse"
 	"strconv"
 
@@ -59,7 +60,8 @@ func (res *ResultsHandlers) GetListByTest(w http.ResponseWriter, r *http.Request
 
 	results, err := res.results.GetListByTest(ctx, testId, uint(skip), uint(take))
 	if err != nil {
-		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
 		return
 	}
 
@@ -80,7 +82,8 @@ func (res *ResultsHandlers) DeleteResult(w http.ResponseWriter, r *http.Request,
 
 	msg, err := res.results.DeleteResult(ctx, uint(resultId))
 	if err != nil {
-		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
 		return
 	}
 
@@ -101,7 +104,8 @@ func (res *ResultsHandlers) DeleteResultsByTest(w http.ResponseWriter, r *http.R
 
 	msg, err := res.results.DeleteResultsByTest(ctx, testId)
 	if err != nil {
-		httpresponse.ErrorResponse(w, "Error", http.StatusInternalServerError)
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
 		return
 	}
 
