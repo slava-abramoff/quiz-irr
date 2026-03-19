@@ -1,4 +1,4 @@
-import type { TestAdminResponse } from '../../api/types';
+import type { TestAdminResponse } from "../../api/types";
 
 interface TestsListProps {
   tests: TestAdminResponse[];
@@ -11,7 +11,7 @@ interface TestsListProps {
   onOpenTest: (id: string) => void;
 }
 
-const PAGE_MIN_HEIGHT_CLASS = 'min-h-[200px]';
+const PAGE_MIN_HEIGHT_CLASS = "min-h-[200px]";
 
 export default function TestsList({
   tests,
@@ -29,9 +29,7 @@ export default function TestsList({
   return (
     <main className="mx-auto max-w-6xl px-4 py-6">
       <div className="mb-4 flex items-center justify-between gap-3">
-        <h2 className="text-base font-medium text-gray-900">
-          Список тестов
-        </h2>
+        <h2 className="text-base font-medium text-gray-900">Список тестов</h2>
 
         <button
           type="button"
@@ -92,7 +90,7 @@ export default function TestsList({
                       {test.desc}
                     </p>
                     <p className="mt-1 text-[11px] text-gray-400">
-                      Вопросов: {test.questions?.length ?? 0} · Автор: {test.author}
+                      Автор: {test.author}
                     </p>
                   </div>
 
@@ -138,4 +136,3 @@ export default function TestsList({
     </main>
   );
 }
-
