@@ -33,6 +33,7 @@ func main() {
 	optionsService := services.NewOptionService(optionsRepo)
 	rawService := services.NewRawService(rawRepo)
 	resultsService := services.NewResultsService(resultsRepo)
+	excelService := services.NewExcelService()
 
 	testCases := usecases.NewTestsCases(testsService, optionsService, questionsService)
 	userCases := usecases.NewUsersCases(usersService, authService)
@@ -43,7 +44,7 @@ func main() {
 		optionsService,
 		resultsService,
 	)
-	resultsCases := usecases.NewResultsCases(resultsService)
+	resultsCases := usecases.NewResultsCases(resultsService, excelService)
 
 	testHandler := handlers.NewTestHandlers(testCases, userCases)
 	authHandlers := handlers.NewAuthHandlers(userCases)

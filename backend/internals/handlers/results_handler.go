@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"io"
 	"log"
 	"net/http"
 	"quiz-irr/internals/handlers/dto"
@@ -15,6 +16,11 @@ import (
 
 type ResultsCasesProvider interface {
 	GetListByTest(ctx context.Context, testId uuid.UUID, skip, take uint) (*dto.ResultsReponse, error)
+	MakeExcelList(
+		ctx context.Context,
+		w io.Writer,
+		testId uuid.UUID,
+	) error
 	DeleteResult(ctx context.Context, resultId uint) (*dto.Message, error)
 	DeleteResultsByTest(ctx context.Context, testId uuid.UUID) (*dto.Message, error)
 }
@@ -67,6 +73,25 @@ func (res *ResultsHandlers) GetListByTest(w http.ResponseWriter, r *http.Request
 
 	httpresponse.JsonResponse(w, results, 200)
 	log.Println("get list by test")
+}
+
+func (res *ResultsHandlers) MakeExcelList(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	ctx := r.Context()
+
+	id := ps.ByName("testId")
+	testId, err := uuid.Parse(id)
+	if err != nil {
+		httpresponse.ErrorResponse(w, "Invalid test id", http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+	w.Header().Set(`Content-Disposition`, `attachment; filename="lectures.xlsx"`)
+
+	if err := res.results.MakeExcelList(ctx, w, testId); err != nil {
+		code, msg := apperrors.ToHTTP(err)
+		httpresponse.ErrorResponse(w, msg, code)
+	}
 }
 
 // DELETE /api/results/:resultId

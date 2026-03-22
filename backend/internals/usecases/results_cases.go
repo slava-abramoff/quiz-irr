@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"context"
+	"io"
 	"quiz-irr/internals/handlers/dto"
 	"quiz-irr/internals/storage/models"
 
@@ -28,12 +29,21 @@ type ResultServiceProvider interface {
 	) error
 }
 
-type resultsCases struct {
-	resultService ResultServiceProvider
+type MakeExcelProvider interface {
+	MakeResults(
+		ctx context.Context,
+		writer io.Writer,
+		results []models.TestResult,
+	) error
 }
 
-func NewResultsCases(r ResultServiceProvider) *resultsCases {
-	return &resultsCases{resultService: r}
+type resultsCases struct {
+	resultService ResultServiceProvider
+	excelService  MakeExcelProvider
+}
+
+func NewResultsCases(r ResultServiceProvider, e MakeExcelProvider) *resultsCases {
+	return &resultsCases{resultService: r, excelService: e}
 }
 
 // Работа админа c результами
@@ -69,7 +79,18 @@ func (res *resultsCases) GetListByTest(ctx context.Context, testId uuid.UUID, sk
 
 // func (res *resultsCases) SendAllResultsTestByEmail()
 
-// func (res *resultsCases) MakeExcelList()
+func (res *resultsCases) MakeExcelList(
+	ctx context.Context,
+	w io.Writer,
+	testId uuid.UUID,
+) error {
+	tests, err := res.resultService.GetAll(ctx, testId)
+	if err != nil {
+		return err
+	}
+
+	return res.excelService.MakeResults(ctx, w, tests)
+}
 
 func (res *resultsCases) DeleteResult(ctx context.Context, resultId uint) (*dto.Message, error) {
 	_, err := res.resultService.Delete(ctx, resultId)

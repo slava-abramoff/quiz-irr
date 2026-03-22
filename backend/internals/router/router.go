@@ -58,6 +58,7 @@ func NewRouter(
 
 	// Результаты и рейтинг
 	router.GET("/api/results/test/:testId", basicAuth(res.GetListByTest))
+	router.GET("/api/results/excel/test/:testId", res.MakeExcelList)
 	router.DELETE("/api/results/result/:resultId", basicAuth(res.DeleteResult))
 	router.DELETE("/api/results/test/:testId", basicAuth(res.DeleteResultsByTest))
 
