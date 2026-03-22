@@ -44,6 +44,7 @@ func (r *rawRepo) GetByID(ctx context.Context, id uuid.UUID) (*models.RawSubmiss
 	var sub models.RawSubmission
 
 	err := r.db.WithContext(ctx).
+		Preload("Test").
 		Where("id = ?", id).
 		First(&sub).Error
 

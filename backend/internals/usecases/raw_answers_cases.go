@@ -3,6 +3,7 @@ package usecases
 import (
 	"context"
 	"fmt"
+	"log"
 	"quiz-irr/internals/handlers/dto"
 	"quiz-irr/internals/storage/models"
 	"sort"
@@ -190,6 +191,8 @@ func (rw *rawAnswersCases) AnalyzeResults(ctx context.Context, rawId uuid.UUID) 
 	}
 
 	duration = uint((raw.EndAt.Sub(*raw.StartAt).Seconds()))
+	log.Println("User duration: ", duration)
+	log.Println("System duration: ", raw.Test.Duration)
 	isOnTime := raw.Test.Duration > duration
 
 	_, err = rw.resultsService.Create(
