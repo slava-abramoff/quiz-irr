@@ -140,16 +140,19 @@ func (rw *rawAnswersCases) AnalyzeResults(ctx context.Context, rawId uuid.UUID) 
 		userOptions := answer.OptionIDs
 
 		question, err := rw.questionService.GetByID(ctx, answer.ID)
-		if err != nil {
+		if err != nil || question == nil {
 			return nil, err
 		}
 
 		options, err := rw.optionService.GetCorrectOptions(ctx, question.ID)
-		if err != nil {
+		if err != nil || len(options) == 0 {
 			return nil, err
 		}
 
 		if question.Type == "single" {
+			if len(userOptions) == 0 {
+				continue
+			}
 			if options[0].ID == userOptions[0] {
 				totalScore += question.Points
 			}
@@ -190,6 +193,9 @@ func (rw *rawAnswersCases) AnalyzeResults(ctx context.Context, rawId uuid.UUID) 
 		}
 	}
 
+	if raw.StartAt == nil || raw.EndAt == nil {
+		return nil, fmt.Errorf("raw submission timing is incomplete")
+	}
 	duration = uint((raw.EndAt.Sub(*raw.StartAt).Seconds()))
 	log.Println("User duration: ", duration)
 	log.Println("System duration: ", raw.Test.Duration)

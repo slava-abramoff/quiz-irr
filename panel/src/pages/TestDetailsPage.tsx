@@ -8,7 +8,11 @@ import {
   deleteRawAnswers,
   getRawResultsByTest,
 } from "../api/raws";
-import { deleteResult, deleteResultsByTest, getResultsByTest } from "../api/results";
+import {
+  deleteResult,
+  deleteResultsByTest,
+  getResultsByTest,
+} from "../api/results";
 import type {
   RawsInfoResponse,
   ResultsResponse,
@@ -73,6 +77,7 @@ function formatDuration(seconds: number | null | undefined): string {
 function formatRawStatus(status: string | null | undefined): string {
   if (status === "end") return "окончен";
   if (status === "started") return "начат";
+  if (status === "handled") return "обработан";
   return status ?? "—";
 }
 
@@ -98,18 +103,18 @@ export default function TestDetailsPage() {
   const [isLoadingResults, setIsLoadingResults] = useState(false);
   const [resultsError, setResultsError] = useState<string | null>(null);
 
-  const [analyzingRawIds, setAnalyzingRawIds] = useState<Record<string, boolean>>(
-    {},
-  );
+  const [analyzingRawIds, setAnalyzingRawIds] = useState<
+    Record<string, boolean>
+  >({});
   const [deletingRawIds, setDeletingRawIds] = useState<Record<string, boolean>>(
     {},
   );
   const [isDeletingAllRaws, setIsDeletingAllRaws] = useState(false);
   const [isAnalyzingAllRaws, setIsAnalyzingAllRaws] = useState(false);
 
-  const [deletingResultIds, setDeletingResultIds] = useState<Record<number, boolean>>(
-    {},
-  );
+  const [deletingResultIds, setDeletingResultIds] = useState<
+    Record<number, boolean>
+  >({});
   const [isDeletingAllResults, setIsDeletingAllResults] = useState(false);
 
   const isAuthenticated =
@@ -192,7 +197,9 @@ export default function TestDetailsPage() {
       const data = await getRawResultsByTest(id, { skip, take: PAGE_SIZE });
       setRaws(data);
     } catch (err: any) {
-      const message = err?.response?.data?.message ?? "Не удалось загрузить необработанные ответы.";
+      const message =
+        err?.response?.data?.message ??
+        "Не удалось загрузить необработанные ответы.";
       setRawsError(message);
     } finally {
       setIsLoadingRaws(false);
@@ -208,7 +215,9 @@ export default function TestDetailsPage() {
       const data = await getResultsByTest(id, { skip, take: PAGE_SIZE });
       setResults(data);
     } catch (err: any) {
-      const message = err?.response?.data?.message ?? "Не удалось загрузить результаты теста.";
+      const message =
+        err?.response?.data?.message ??
+        "Не удалось загрузить результаты теста.";
       setResultsError(message);
     } finally {
       setIsLoadingResults(false);
@@ -232,7 +241,8 @@ export default function TestDetailsPage() {
       await analyzeRaw(rawId);
       await loadRaws(rawsPage);
     } catch (err: any) {
-      const message = err?.response?.data?.message ?? "Не удалось выполнить анализ.";
+      const message =
+        err?.response?.data?.message ?? "Не удалось выполнить анализ.";
       setRawsError(message);
     } finally {
       setAnalyzingRawIds((prev) => ({ ...prev, [rawId]: false }));
@@ -246,7 +256,8 @@ export default function TestDetailsPage() {
       setActiveTab("results");
       setResultsPage(1);
     } catch (err: any) {
-      const message = err?.response?.data?.message ?? "Не удалось выполнить анализ.";
+      const message =
+        err?.response?.data?.message ?? "Не удалось выполнить анализ.";
       setRawsError(message);
     } finally {
       setAnalyzingRawIds((prev) => ({ ...prev, [rawId]: false }));
@@ -259,7 +270,8 @@ export default function TestDetailsPage() {
       await deleteRawAnswers(rawId);
       await loadRaws(rawsPage);
     } catch (err: any) {
-      const message = err?.response?.data?.message ?? "Не удалось удалить запись.";
+      const message =
+        err?.response?.data?.message ?? "Не удалось удалить запись.";
       setRawsError(message);
     } finally {
       setDeletingRawIds((prev) => ({ ...prev, [rawId]: false }));
@@ -556,7 +568,9 @@ export default function TestDetailsPage() {
                     <button
                       type="button"
                       onClick={handleAnalyzeAllRaws}
-                      disabled={isAnalyzingAllRaws || isLoadingRaws || !rawRows.length}
+                      disabled={
+                        isAnalyzingAllRaws || isLoadingRaws || !rawRows.length
+                      }
                       className="inline-flex items-center rounded-md bg-gray-900 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-gray-800 disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                       {isAnalyzingAllRaws ? "Проверяем..." : "Проверить все"}
@@ -564,7 +578,9 @@ export default function TestDetailsPage() {
                     <button
                       type="button"
                       onClick={handleDeleteAllRaws}
-                      disabled={isDeletingAllRaws || isLoadingRaws || !rawRows.length}
+                      disabled={
+                        isDeletingAllRaws || isLoadingRaws || !rawRows.length
+                      }
                       className="inline-flex items-center rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                       Удалить все
@@ -573,7 +589,8 @@ export default function TestDetailsPage() {
 
                   {rawPagination && (
                     <p className="text-xs text-gray-500">
-                      Страница {rawPagination.current_page} из {rawPagination.total_pages}
+                      Страница {rawPagination.current_page} из{" "}
+                      {rawPagination.total_pages}
                     </p>
                   )}
                 </div>
@@ -599,7 +616,10 @@ export default function TestDetailsPage() {
                       <tbody className="divide-y divide-gray-100 bg-white">
                         {rawRows.length === 0 ? (
                           <tr>
-                            <td colSpan={7} className="px-3 py-6 text-center text-sm text-gray-500">
+                            <td
+                              colSpan={7}
+                              className="px-3 py-6 text-center text-sm text-gray-500"
+                            >
                               Не найдено необработанных ответов.
                             </td>
                           </tr>
@@ -623,7 +643,9 @@ export default function TestDetailsPage() {
                                   {formatRawStatus(row.status)}
                                 </td>
                                 <td className="px-3 py-3 text-gray-700">
-                                  {row.start_at ? formatDate(row.start_at) : "—"}
+                                  {row.start_at
+                                    ? formatDate(row.start_at)
+                                    : "—"}
                                 </td>
                                 <td className="px-3 py-3 text-gray-700">
                                   {row.end_at ? formatDate(row.end_at) : "—"}
@@ -633,15 +655,21 @@ export default function TestDetailsPage() {
                                     <button
                                       type="button"
                                       onClick={() => handleAnalyzeRaw(row.id)}
-                                      disabled={isStarted || isAnalyzing || isDeleting}
+                                      disabled={
+                                        isStarted || isAnalyzing || isDeleting
+                                      }
                                       className="inline-flex items-center rounded-md bg-gray-900 px-2.5 py-1 text-[11px] font-medium text-white shadow-sm hover:bg-gray-800 disabled:opacity-60 disabled:cursor-not-allowed"
                                     >
                                       Проверить
                                     </button>
                                     <button
                                       type="button"
-                                      onClick={() => handleAnalyzeRawToResults(row.id)}
-                                      disabled={isStarted || isAnalyzing || isDeleting}
+                                      onClick={() =>
+                                        handleAnalyzeRawToResults(row.id)
+                                      }
+                                      disabled={
+                                        isStarted || isAnalyzing || isDeleting
+                                      }
                                       className="inline-flex items-center rounded-md border border-gray-200 bg-white px-2.5 py-1 text-[11px] font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed"
                                     >
                                       Анализ
@@ -676,7 +704,8 @@ export default function TestDetailsPage() {
                         type="button"
                         disabled={!rawPagination.has_previous_page}
                         onClick={() =>
-                          rawPagination.has_previous_page && setRawsPage((p) => p - 1)
+                          rawPagination.has_previous_page &&
+                          setRawsPage((p) => p - 1)
                         }
                         className="inline-flex items-center rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
@@ -686,7 +715,8 @@ export default function TestDetailsPage() {
                         type="button"
                         disabled={!rawPagination.has_next_page}
                         onClick={() =>
-                          rawPagination.has_next_page && setRawsPage((p) => p + 1)
+                          rawPagination.has_next_page &&
+                          setRawsPage((p) => p + 1)
                         }
                         className="inline-flex items-center rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
@@ -714,7 +744,11 @@ export default function TestDetailsPage() {
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
-                          onClick={() => window.alert("Функция «Уведомить участников» пока в разработке.")}
+                          onClick={() =>
+                            window.alert(
+                              "Функция «Уведомить участников» пока в разработке.",
+                            )
+                          }
                           disabled={isLoadingResults || isDeletingAllResults}
                           className="inline-flex items-center rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed"
                         >
@@ -722,7 +756,11 @@ export default function TestDetailsPage() {
                         </button>
                         <button
                           type="button"
-                          onClick={() => window.alert("Функция «Импорт Excel» пока в разработке.")}
+                          onClick={() =>
+                            window.alert(
+                              "Функция «Импорт Excel» пока в разработке.",
+                            )
+                          }
                           disabled={isLoadingResults || isDeletingAllResults}
                           className="inline-flex items-center rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed"
                         >
@@ -733,7 +771,11 @@ export default function TestDetailsPage() {
                       <button
                         type="button"
                         onClick={handleDeleteAllResults}
-                        disabled={isDeletingAllResults || isLoadingResults || !resultsRows.length}
+                        disabled={
+                          isDeletingAllResults ||
+                          isLoadingResults ||
+                          !resultsRows.length
+                        }
                         className="inline-flex items-center rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 disabled:opacity-60 disabled:cursor-not-allowed"
                       >
                         Удалить все
@@ -787,7 +829,9 @@ export default function TestDetailsPage() {
                                 <td className="px-3 py-3 text-right">
                                   <button
                                     type="button"
-                                    onClick={() => handleDeleteResultRow(row.id)}
+                                    onClick={() =>
+                                      handleDeleteResultRow(row.id)
+                                    }
                                     disabled={
                                       isDeletingAllResults ||
                                       !!deletingResultIds[row.id]
