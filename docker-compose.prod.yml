@@ -1,0 +1,77 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: quiz_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: quiz_cache
+    restart: always
+    ports:
+      - "${CACHE_PORT}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: quiz_backend
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "${BACKEND_PORT}:8080"
+
+  panel:
+    build:
+      context: ./panel
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${PANEL_VITE_API_URL}
+        QUIZ_FRONTEND: ${QUIZ_FRONTEND}
+    container_name: quiz_panel
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "${PANEL_PORT}:81"
+
+  quiz:
+    build:
+      context: ./quiz
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${QUIZ_VITE_API_URL}
+    container_name: quiz_front
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "${QUIZ_PORT}:80"
+
+volumes:
+  postgres_data:
+  redis_data:
