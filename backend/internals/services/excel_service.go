@@ -36,8 +36,6 @@ func (e *excelService) MakeResults(
 	})
 
 	headers := []string{
-		"ID",
-		"ID теста",
 		"ФИО",
 		"Почта",
 		"Учреждение",
@@ -83,8 +81,6 @@ func (e *excelService) MakeResults(
 		row := i + 2
 
 		values := []interface{}{
-			r.ID,
-			r.TestID.String(),
 			r.FullName,
 			r.Email,
 			r.Org,
@@ -103,7 +99,7 @@ func (e *excelService) MakeResults(
 			}
 		}
 
-		timeCell, err := excelize.CoordinatesToCellName(6, row)
+		timeCell, err := excelize.CoordinatesToCellName(4, row)
 		if err != nil {
 			return fmt.Errorf("excel time cell name: %w", err)
 		}
@@ -122,7 +118,7 @@ func (e *excelService) MakeResults(
 		}
 	}
 
-	scoreCol := "H"
+	scoreCol := "F"
 	lastRow := len(results) + 1
 
 	if lastRow >= 2 {

@@ -30,3 +30,10 @@ export async function deleteResultsByTest(testId: string): Promise<SimpleMessage
   return data;
 }
 
+export async function exportResultsExcelByTest(testId: string): Promise<Blob> {
+  const { data } = await api.get<Blob>(`/results/excel/test/${testId}`, {
+    responseType: 'blob',
+  });
+  return data;
+}
+

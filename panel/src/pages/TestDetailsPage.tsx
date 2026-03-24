@@ -11,6 +11,7 @@ import {
 import {
   deleteResult,
   deleteResultsByTest,
+  exportResultsExcelByTest,
   getResultsByTest,
 } from "../api/results";
 import type {
@@ -120,6 +121,7 @@ export default function TestDetailsPage() {
     Record<number, boolean>
   >({});
   const [isDeletingAllResults, setIsDeletingAllResults] = useState(false);
+  const [isExportingExcel, setIsExportingExcel] = useState(false);
 
   const isAuthenticated =
     typeof window !== "undefined" && !!localStorage.getItem("access_token");
@@ -367,6 +369,31 @@ export default function TestDetailsPage() {
       setResultsError(message);
     } finally {
       setIsDeletingAllResults(false);
+    }
+  };
+
+  const handleExportExcel = async () => {
+    if (!id || isExportingExcel) return;
+
+    setIsExportingExcel(true);
+    setResultsError(null);
+
+    try {
+      const blob = await exportResultsExcelByTest(id);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `results-${id}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.message ?? "Не удалось экспортировать Excel.";
+      setResultsError(message);
+    } finally {
+      setIsExportingExcel(false);
     }
   };
 
@@ -790,15 +817,15 @@ export default function TestDetailsPage() {
                         </button>
                         <button
                           type="button"
-                          onClick={() =>
-                            window.alert(
-                              "Функция «Импорт Excel» пока в разработке.",
-                            )
+                          onClick={handleExportExcel}
+                          disabled={
+                            isLoadingResults ||
+                            isDeletingAllResults ||
+                            isExportingExcel
                           }
-                          disabled={isLoadingResults || isDeletingAllResults}
                           className="inline-flex items-center rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed"
                         >
-                          Экспорт Excel
+                          {isExportingExcel ? "Экспортируем..." : "Экспорт Excel"}
                         </button>
                       </div>
 
