@@ -111,18 +111,19 @@ export default function EditorPage() {
     typeof window !== 'undefined' && !!localStorage.getItem('access_token');
 
   useEffect(() => {
+    const testId = id;
     if (!isAuthenticated) {
       navigate('/login', { replace: true });
       return;
     }
-    if (!id) return;
+    if (!testId) return;
 
     async function loadTest() {
       try {
         setIsLoading(true);
         setError(null);
         // mode "fulldata" – сервер вернёт полные данные теста
-        const data = await getTest(id, 'fulldata');
+        const data = await getTest(testId as string, 'fulldata');
 
         const normalized: TestAdminResponse = {
           ...data,

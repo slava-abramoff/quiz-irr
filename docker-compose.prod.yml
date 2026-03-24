@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgres:15-alpine
     container_name: quiz_db
     restart: always
     environment:
@@ -42,13 +42,13 @@ services:
       ADMIN_NAME: ${ADMIN_NAME}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
       ADMIN_EMAIL: ${ADMIN_EMAIL}
-      POSTGRES_HOST: quiz_db
+      POSTGRES_HOST: postgres
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_PORT: 5432
       GORM_LOG_LEVEL: ${GORM_LOG_LEVEL}
-      BACKEND_PORT: ${BACKEND_PORT}
+      BACKEND_PORT: ":8080"
     depends_on:
       postgres:
         condition: service_healthy

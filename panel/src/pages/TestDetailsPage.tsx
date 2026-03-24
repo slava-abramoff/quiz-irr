@@ -121,17 +121,18 @@ export default function TestDetailsPage() {
     typeof window !== "undefined" && !!localStorage.getItem("access_token");
 
   useEffect(() => {
+    const testId = id;
     if (!isAuthenticated) {
       navigate("/login", { replace: true });
       return;
     }
-    if (!id) return;
+    if (!testId) return;
 
     async function loadTest() {
       try {
         setIsLoading(true);
         setError(null);
-        const data = await getTestPreview(id);
+        const data = await getTestPreview(testId as string);
         setTest(data);
       } catch (err: any) {
         const message =

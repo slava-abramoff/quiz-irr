@@ -16,37 +16,29 @@ import (
 	"github.com/joho/godotenv"
 )
 
+func getenvOrDefault(key, fallback string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		return fallback
+	}
+	return value
+}
+
 func main() {
-	var env bool
+	// Optional .env for local development; in containers vars come from runtime env.
 	if err := godotenv.Load(); err != nil {
-		env = false
-	} else {
-		env = true
+		log.Println(".env not found, using process environment")
 	}
 
-	var secret string
-	var port string
-	var root dto.CreateUserRequest
-
-	if env {
-		secret = os.Getenv("SECRET")
-		port = os.Getenv("BACKEND_PORT")
-		root = dto.CreateUserRequest{
-			FullName: os.Getenv("ADMIN_NAME"),
-			Password: os.Getenv("ADMIN_PASSWORD"),
-			Email:    os.Getenv("ADMIN_EMAIL"),
-		}
-	} else {
-		secret = "FDGSSDFGSDFG"
-		port = ":8080"
-		root = dto.CreateUserRequest{
-			FullName: "Абрамов Вячеслав Александрович",
-			Password: "changeme",
-			Email:    "vyachik005@gmail.com",
-		}
+	secret := getenvOrDefault("SECRET", "FDGSSDFGSDFG")
+	port := getenvOrDefault("BACKEND_PORT", ":8080")
+	root := dto.CreateUserRequest{
+		FullName: getenvOrDefault("ADMIN_NAME", "Абрамов Вячеслав Александрович"),
+		Password: getenvOrDefault("ADMIN_PASSWORD", "changeme"),
+		Email:    getenvOrDefault("ADMIN_EMAIL", "vyachik005@gmail.com"),
 	}
 
-	db, err := database.ConnectDB(env)
+	db, err := database.ConnectDB()
 	if err != nil {
 		log.Fatal("Failed connect: " + err.Error())
 	}

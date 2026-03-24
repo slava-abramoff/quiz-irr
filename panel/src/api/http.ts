@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosHeaders } from 'axios';
 import type { RefreshTokenRequest, RefreshTokenResponse } from './types';
 
 const api = axios.create({
@@ -9,11 +9,10 @@ api.interceptors.request.use((config) => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
 
   if (token) {
+    const headers = AxiosHeaders.from(config.headers);
+    headers.set('Authorization', `Bearer ${token}`);
     // eslint-disable-next-line no-param-reassign
-    config.headers = {
-      ...config.headers,
-      Authorization: `Bearer ${token}`,
-    };
+    config.headers = headers;
   }
 
   return config;
@@ -72,11 +71,10 @@ api.interceptors.response.use(
       try {
         const newAccessToken = await refreshAccessToken();
 
+        const headers = AxiosHeaders.from(originalRequest.headers);
+        headers.set('Authorization', `Bearer ${newAccessToken}`);
         // eslint-disable-next-line no-param-reassign
-        originalRequest.headers = {
-          ...originalRequest.headers,
-          Authorization: `Bearer ${newAccessToken}`,
-        };
+        originalRequest.headers = headers;
 
         return api(originalRequest);
       } catch (refreshError) {
