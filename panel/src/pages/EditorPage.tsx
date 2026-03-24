@@ -78,9 +78,10 @@ function inputDateTimeToBackend(value: string | null | undefined): string | unde
   const [datePart, timePart] = value.split('T');
   if (!datePart || !timePart) return undefined;
 
-  // Вычисляем текущий часовой пояс клиента
-  const now = new Date();
-  const offsetMinutes = -now.getTimezoneOffset(); // например, +180 для UTC+3
+  // Используем смещение именно выбранной даты/времени (важно для DST-зон).
+  const localDateTime = new Date(`${datePart}T${timePart}:00`);
+  if (Number.isNaN(localDateTime.getTime())) return undefined;
+  const offsetMinutes = -localDateTime.getTimezoneOffset(); // например, +180 для UTC+3
   const sign = offsetMinutes >= 0 ? '+' : '-';
   const absMinutes = Math.abs(offsetMinutes);
   const offsetHoursPart = String(Math.floor(absMinutes / 60)).padStart(2, '0');

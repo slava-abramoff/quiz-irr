@@ -1,6 +1,17 @@
-/** Moscow wall time as `YYYY-MM-DD HH:mm:ss` → instant (MSK is UTC+3, no DST). */
+/** Parses server datetime (RFC3339 preferred, legacy `YYYY-MM-DD HH:mm:ss` also supported). */
 export function parseMoscowDatetime(s: string): Date {
   const trimmed = s.trim()
+  if (!trimmed) {
+    return new Date(NaN)
+  }
+
+  // Preferred backend contract: RFC3339 with explicit timezone.
+  const direct = new Date(trimmed)
+  if (!Number.isNaN(direct.getTime())) {
+    return direct
+  }
+
+  // Legacy format support: `YYYY-MM-DD HH:mm:ss`, treated as MSK wall time.
   const [datePart, timePart] = trimmed.split(/\s+/)
   if (!datePart || !timePart) {
     return new Date(NaN)

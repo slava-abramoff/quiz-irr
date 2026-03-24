@@ -39,17 +39,19 @@ const MONTHS_RU = [
 function formatDate(value: string | null | undefined): string {
   if (!value) return "—";
 
-  // backend format: "2006-01-02 15:04:05"
-  const safe = value.replace(" ", "T");
-  const date = new Date(safe);
+  // Preferred backend format is RFC3339; fallback supports legacy datetime.
+  const date = new Date(value);
+  const parsed = Number.isNaN(date.getTime())
+    ? new Date(`${value.replace(" ", "T")}+03:00`)
+    : date;
 
-  if (Number.isNaN(date.getTime())) return value;
+  if (Number.isNaN(parsed.getTime())) return value;
 
-  const day = String(date.getDate()).padStart(2, "0");
-  const monthName = MONTHS_RU[date.getMonth()];
-  const year = date.getFullYear();
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const day = String(parsed.getDate()).padStart(2, "0");
+  const monthName = MONTHS_RU[parsed.getMonth()];
+  const year = parsed.getFullYear();
+  const hours = String(parsed.getHours()).padStart(2, "0");
+  const minutes = String(parsed.getMinutes()).padStart(2, "0");
 
   return `${day} ${monthName} ${year} ${hours}:${minutes}`;
 }

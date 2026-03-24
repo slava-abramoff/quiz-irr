@@ -4,6 +4,7 @@ import (
 	"context"
 	"quiz-irr/internals/handlers/dto"
 	"quiz-irr/internals/storage/models"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -61,10 +62,10 @@ func (t *testsCases) NewTest(
 
 	var startAt, endAt string
 	if test.StartAt != nil {
-		startAt = test.StartAt.Format("2006-01-02 15:04:05")
+		startAt = formatRFC3339(test.StartAt)
 	}
 	if test.EndAt != nil {
-		endAt = test.EndAt.Format("2006-01-02 15:04:05")
+		endAt = formatRFC3339(test.EndAt)
 	}
 
 	return &dto.TestAdminResponse{
@@ -90,10 +91,10 @@ func (t *testsCases) GetTestPreview(
 
 	var startAt, endAt string
 	if test.StartAt != nil {
-		startAt = test.StartAt.Format("2006-01-02 15:04:05")
+		startAt = formatRFC3339(test.StartAt)
 	}
 	if test.EndAt != nil {
-		endAt = test.EndAt.Format("2006-01-02 15:04:05")
+		endAt = formatRFC3339(test.EndAt)
 	}
 
 	return &dto.TestAdminResponse{
@@ -119,10 +120,10 @@ func (t *testsCases) FindManyTests(ctx context.Context, skip, take uint) (*dto.G
 	for _, test := range tests {
 		var startAt, endAt string
 		if test.StartAt != nil {
-			startAt = test.StartAt.Format("2006-01-02 15:04:05")
+			startAt = formatRFC3339(test.StartAt)
 		}
 		if test.EndAt != nil {
-			endAt = test.EndAt.Format("2006-01-02 15:04:05")
+			endAt = formatRFC3339(test.EndAt)
 		}
 
 		testDto := dto.TestAdminResponse{
@@ -159,10 +160,10 @@ func (t *testsCases) GetTestFullData(
 
 	var startAt, endAt string
 	if test.StartAt != nil {
-		startAt = test.StartAt.Format("2006-01-02 15:04:05")
+		startAt = formatRFC3339(test.StartAt)
 	}
 	if test.EndAt != nil {
-		endAt = test.EndAt.Format("2006-01-02 15:04:05")
+		endAt = formatRFC3339(test.EndAt)
 	}
 
 	testData = dto.TestAdminResponse{
@@ -233,10 +234,17 @@ func (t *testsCases) UpdateTest(
 		Desc:     test.Desc,
 		IsActive: test.IsActive,
 		Duration: test.Duration,
-		StartAt:  test.StartAt.Format("2006-01-02 15:04:05"),
-		EndAt:    test.EndAt.Format("2006-01-02 15:04:05"),
+		StartAt:  formatRFC3339(test.StartAt),
+		EndAt:    formatRFC3339(test.EndAt),
 		Author:   test.Author.FullName,
 	}, nil
+}
+
+func formatRFC3339(t *time.Time) string {
+	if t == nil {
+		return ""
+	}
+	return t.Format(time.RFC3339)
 }
 
 // DeleteTest удаляет конкретный тест

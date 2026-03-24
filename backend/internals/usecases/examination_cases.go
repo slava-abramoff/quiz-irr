@@ -59,8 +59,8 @@ func (e *examCases) GetTestInfo(ctx context.Context, id uuid.UUID) (*dto.TestCus
 		Title:    test.Title,
 		Desc:     test.Desc,
 		Duration: test.Duration,
-		StartAt:  test.StartAt.Format("2006-01-02 15:04:05"),
-		EndAt:    test.EndAt.Format("2006-01-02 15:04:05"),
+		StartAt:  test.StartAt.Format(time.RFC3339),
+		EndAt:    test.EndAt.Format(time.RFC3339),
 	}, nil
 }
 

@@ -7,6 +7,7 @@ import (
 	"quiz-irr/internals/handlers/dto"
 	"quiz-irr/internals/storage/models"
 	"sort"
+	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/datatypes"
@@ -81,12 +82,12 @@ func (rw *rawAnswersCases) FindRawResults(ctx context.Context, testId uuid.UUID,
 	for _, raw := range raws {
 		var startAt string
 		if raw.StartAt != nil {
-			startAt = raw.StartAt.Format("2006-01-02 15:04:05")
+			startAt = raw.StartAt.Format(time.RFC3339)
 		}
 
 		var endAt string
 		if raw.EndAt != nil {
-			endAt = raw.EndAt.Format("2006-01-02 15:04:05")
+			endAt = raw.EndAt.Format(time.RFC3339)
 		}
 
 		rawDto := dto.RawInfoResponse{
