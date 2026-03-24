@@ -92,6 +92,8 @@ export default function TestDetailsPage() {
   const [activeTab, setActiveTab] = useState<TabKey>("unprocessed");
   const [isDescExpanded, setIsDescExpanded] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isCopyingLink, setIsCopyingLink] = useState(false);
+  const [isLinkCopied, setIsLinkCopied] = useState(false);
 
   const PAGE_SIZE = 10;
 
@@ -188,6 +190,23 @@ export default function TestDetailsPage() {
       setError(message);
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleCopyTestLink = async () => {
+    if (!id || isCopyingLink) return;
+
+    const testLink = `https://kviz.edu-penza.ru/${id}`;
+    setIsCopyingLink(true);
+
+    try {
+      await navigator.clipboard.writeText(testLink);
+      setIsLinkCopied(true);
+      window.setTimeout(() => setIsLinkCopied(false), 1800);
+    } catch {
+      setError("Не удалось скопировать ссылку.");
+    } finally {
+      setIsCopyingLink(false);
     }
   };
 
@@ -482,8 +501,20 @@ export default function TestDetailsPage() {
                   </p>
                   <button
                     type="button"
+                    onClick={handleCopyTestLink}
+                    disabled={isCopyingLink}
+                    className="mt-1 inline-flex w-36 justify-center items-center rounded-md border border-gray-200 bg-white px-3 py-1.5 text-[11px] font-medium text-gray-700 shadow-sm hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {isLinkCopied
+                      ? "Ссылка скопирована"
+                      : isCopyingLink
+                        ? "Копируем..."
+                        : "Скопировать ссылку"}
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => id && navigate(`/editor/${id}`)}
-                    className="mt-1 inline-flex items-center rounded-md bg-gray-900 px-3 py-1.5 text-[11px] font-medium text-white shadow-sm hover:bg-gray-800"
+                    className="mt-1 inline-flex w-36 justify-center items-center rounded-md bg-gray-900 px-3 py-1.5 text-[11px] font-medium text-white shadow-sm hover:bg-gray-800"
                   >
                     Редактировать
                   </button>
@@ -491,7 +522,7 @@ export default function TestDetailsPage() {
                     type="button"
                     onClick={handleDeleteTest}
                     disabled={isDeleting}
-                    className="inline-flex items-center rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-[11px] font-medium text-red-700 hover:bg-red-100 disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="inline-flex w-36 justify-center items-center rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-[11px] font-medium text-red-700 hover:bg-red-100 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {isDeleting ? "Удаляем..." : "Удалить тест"}
                   </button>
@@ -767,7 +798,7 @@ export default function TestDetailsPage() {
                           disabled={isLoadingResults || isDeletingAllResults}
                           className="inline-flex items-center rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed"
                         >
-                          Импорт Excel
+                          Экспорт Excel
                         </button>
                       </div>
 
