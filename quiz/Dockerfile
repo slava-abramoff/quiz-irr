@@ -4,15 +4,15 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # принимаем build-time переменную от docker-compose
-ARG VITE_API_URL
-ENV VITE_API_URL=${VITE_API_URL}
+ARG VITE_API_BASE
+ENV VITE_API_BASE=${VITE_API_BASE}
 
 COPY package*.json ./
 RUN npm install
 
 COPY . .
 
-# Vite увидит VITE_API_URL здесь
+# Vite увидит VITE_API_BASE здесь
 RUN npm run build
 
 # ---------- serve ----------
