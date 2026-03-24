@@ -12,25 +12,28 @@ import (
 
 // cfg *config.Database
 
-func ConnectDB() (*gorm.DB, error) {
+func ConnectDB(envExist bool) (*gorm.DB, error) {
+	var dsn string
 
-	// dsn := fmt.Sprintf(
-	// 	"host=%s user=%s password=%s dbname=%s port=%d sslmode=disable",
-	// 	cfg.Host,
-	// 	cfg.User,
-	// 	cfg.Password,
-	// 	cfg.DB,
-	// 	cfg.Port,
-	// )
-	//
-	dsn := fmt.Sprintf(
-		"host=%s user=%s password=%s dbname=%s port=%d sslmode=disable",
-		"localhost",
-		"user",
-		"password",
-		"my_database",
-		5432,
-	)
+	if !envExist {
+		dsn = fmt.Sprintf(
+			"host=%s user=%s password=%s dbname=%s port=%d sslmode=disable",
+			"localhost",
+			"user",
+			"password",
+			"my_database",
+			5432,
+		)
+	} else {
+		dsn = fmt.Sprintf(
+			"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
+			os.Getenv("POSTGRES_HOST"),
+			os.Getenv("POSTGRES_USER"),
+			os.Getenv("POSTGRES_PASSWORD"),
+			os.Getenv("POSTGRES_DB"),
+			os.Getenv("POSTGRES_PORT"),
+		)
+	}
 
 	// Default to silent to avoid noisy SQL logs in console.
 	// Override with GORM_LOG_LEVEL: silent|error|warn|info
