@@ -1,9 +1,10 @@
 package dto
 
 type StartExamRequest struct {
-	FullName string `json:"full_name"`
-	Email    string `json:"email"`
-	Org      string `json:"org"`
+	FullName  string `json:"full_name"`
+	Email     string `json:"email"`
+	Org       string `json:"org"`
+	BirthYear uint   `json:"birth_year"`
 }
 
 type StartExamResponse struct {

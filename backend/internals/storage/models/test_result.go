@@ -8,9 +8,10 @@ type TestResult struct {
 	Test   Test      `gorm:"foreignKey:TestID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 
 	// Данные участника
-	FullName string `gorm:"type:varchar(255);not null"`
-	Email    string `gorm:"type:varchar(255);not null"`
-	Org      string `gorm:"type:varchar(255)"`
+	FullName  string `gorm:"type:varchar(255);not null"`
+	Email     string `gorm:"type:varchar(255);not null"`
+	Org       string `gorm:"type:varchar(255)"`
+	BirthYear *uint
 
 	// Метрики результата
 	Duration   uint `gorm:"not null"`

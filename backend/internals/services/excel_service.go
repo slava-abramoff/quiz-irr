@@ -16,21 +16,20 @@ func NewExcelService() *excelService {
 	return &excelService{}
 }
 
-func (e *excelService) MakeResults(
-	ctx context.Context,
-	writer io.Writer,
-	results []models.TestResult,
-) error {
-	f := excelize.NewFile()
-	defer func() {
-		_ = f.Close()
-	}()
-
-	sheet := "Results"
-	if err := f.SetSheetName("Sheet1", sheet); err != nil {
-		return fmt.Errorf("excel set sheet name: %w", err)
+func groupByBirthYear(by *uint) string {
+	if by == nil {
+		return "C"
 	}
+	if *by >= 2008 && *by <= 2010 {
+		return "A"
+	}
+	if *by >= 2011 && *by <= 2013 {
+		return "B"
+	}
+	return "C"
+}
 
+func (e *excelService) fillResultsSheet(f *excelize.File, sheet string, results []models.TestResult) error {
 	sort.Slice(results, func(i, j int) bool {
 		return results[i].TotalScore > results[j].TotalScore
 	})
@@ -39,6 +38,7 @@ func (e *excelService) MakeResults(
 		"ФИО",
 		"Почта",
 		"Учреждение",
+		"Год рождения",
 		"Время",
 		"В срок",
 		"Итого",
@@ -80,10 +80,18 @@ func (e *excelService) MakeResults(
 	for i, r := range results {
 		row := i + 2
 
+		var birthYear interface{}
+		if r.BirthYear != nil {
+			birthYear = *r.BirthYear
+		} else {
+			birthYear = ""
+		}
+
 		values := []interface{}{
 			r.FullName,
 			r.Email,
 			r.Org,
+			birthYear,
 			float64(r.Duration) / 86400,
 			r.IsOnTime,
 			r.TotalScore,
@@ -99,7 +107,8 @@ func (e *excelService) MakeResults(
 			}
 		}
 
-		timeCell, err := excelize.CoordinatesToCellName(4, row)
+		// "Время" — 5-я колонка после добавления BirthYear.
+		timeCell, err := excelize.CoordinatesToCellName(5, row)
 		if err != nil {
 			return fmt.Errorf("excel time cell name: %w", err)
 		}
@@ -118,7 +127,8 @@ func (e *excelService) MakeResults(
 		}
 	}
 
-	scoreCol := "F"
+	// "Итого" — 7-я колонка после добавления BirthYear.
+	scoreCol := "G"
 	lastRow := len(results) + 1
 
 	if lastRow >= 2 {
@@ -177,6 +187,55 @@ func (e *excelService) MakeResults(
 	filterRef := fmt.Sprintf("A1:%s%d", endCol, lastRow)
 	if err := f.AutoFilter(sheet, filterRef, nil); err != nil {
 		return fmt.Errorf("excel autofilter: %w", err)
+	}
+
+	return nil
+}
+
+func (e *excelService) MakeResults(
+	ctx context.Context,
+	writer io.Writer,
+	results []models.TestResult,
+) error {
+	f := excelize.NewFile()
+	defer func() {
+		_ = f.Close()
+	}()
+
+	sheetA := "Группа A"
+	sheetB := "Группа B"
+	sheetC := "Группа C"
+
+	if err := f.SetSheetName("Sheet1", sheetA); err != nil {
+		return fmt.Errorf("excel set sheet name: %w", err)
+	}
+	if _, err := f.NewSheet(sheetB); err != nil {
+		return fmt.Errorf("excel create sheet B: %w", err)
+	}
+	if _, err := f.NewSheet(sheetC); err != nil {
+		return fmt.Errorf("excel create sheet C: %w", err)
+	}
+
+	var groupA, groupB, groupC []models.TestResult
+	for _, r := range results {
+		switch groupByBirthYear(r.BirthYear) {
+		case "A":
+			groupA = append(groupA, r)
+		case "B":
+			groupB = append(groupB, r)
+		default:
+			groupC = append(groupC, r)
+		}
+	}
+
+	if err := e.fillResultsSheet(f, sheetA, groupA); err != nil {
+		return err
+	}
+	if err := e.fillResultsSheet(f, sheetB, groupB); err != nil {
+		return err
+	}
+	if err := e.fillResultsSheet(f, sheetC, groupC); err != nil {
+		return err
 	}
 
 	select {

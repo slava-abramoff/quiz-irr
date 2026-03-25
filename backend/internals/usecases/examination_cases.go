@@ -25,7 +25,7 @@ type OptionInfoProvider interface {
 type RawDataServiceProvider interface {
 	Load(ctx context.Context, id uuid.UUID) (*dto.SendUserAnswersRequest, error)
 	SavePayload(ctx context.Context, id uuid.UUID, data dto.SendUserAnswersRequest) (*models.RawSubmission, error)
-	Create(ctx context.Context, testId uuid.UUID, f, e, o string, start time.Time) (*models.RawSubmission, error)
+	Create(ctx context.Context, testId uuid.UUID, f, e, o string, b uint, start time.Time) (*models.RawSubmission, error)
 }
 
 type examCases struct {
@@ -119,6 +119,7 @@ func (e *examCases) StartTest(ctx context.Context, id uuid.UUID, data dto.StartE
 		data.FullName,
 		data.Email,
 		data.Org,
+		data.BirthYear,
 		startAt,
 	)
 	if err != nil {

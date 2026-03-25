@@ -81,6 +81,11 @@ func (e *ExamHandlers) StartTest(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 
+	if req.BirthYear > 2100 && req.BirthYear < 2000 {
+		httpresponse.ErrorResponse(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+
 	testBody, err := e.exam.StartTest(ctx, testId, req)
 	if err != nil {
 		code, msg := apperrors.ToHTTP(err)

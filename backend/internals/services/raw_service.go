@@ -16,6 +16,7 @@ type RawStorage interface {
 		ctx context.Context,
 		testId uuid.UUID,
 		fn, email, org string,
+		birthYear uint,
 		start time.Time,
 	) (*models.RawSubmission, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*models.RawSubmission, error)
@@ -49,8 +50,9 @@ func NewRawService(r RawStorage) *rawService {
 func (rd *rawService) Create(ctx context.Context,
 	testId uuid.UUID,
 	fn, email, org string,
+	birthYear uint,
 	start time.Time) (*models.RawSubmission, error) {
-	return rd.storage.Create(ctx, testId, fn, email, org, start)
+	return rd.storage.Create(ctx, testId, fn, email, org, birthYear, start)
 }
 
 func (rd *rawService) GetByID(ctx context.Context, id uuid.UUID) (*models.RawSubmission, error) {

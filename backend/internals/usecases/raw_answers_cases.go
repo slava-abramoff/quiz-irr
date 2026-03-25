@@ -44,6 +44,7 @@ type ResultsSaveProvider interface {
 		fullName string,
 		email string,
 		org string,
+		birthYear uint,
 		duration uint,
 		totalScore int,
 		isOnTime bool,
@@ -202,12 +203,21 @@ func (rw *rawAnswersCases) AnalyzeResults(ctx context.Context, rawId uuid.UUID) 
 	log.Println("System duration: ", raw.Test.Duration)
 	isOnTime := raw.Test.Duration > duration
 
+	var birthYear uint
+
+	if raw.BirthYear == nil {
+		birthYear = 2000
+	} else {
+		birthYear = *raw.BirthYear
+	}
+
 	_, err = rw.resultsService.Create(
 		ctx,
 		raw.TestID,
 		raw.FullName,
 		raw.Email,
 		raw.Org,
+		birthYear,
 		duration,
 		totalScore,
 		isOnTime,
@@ -316,11 +326,20 @@ func (rw *rawAnswersCases) AnalyzeAllResults(ctx context.Context, testId uuid.UU
 		duration = uint(raw.EndAt.Sub(*raw.StartAt).Seconds())
 		isOnTime := raw.Test.Duration > duration
 
+		var birthYear uint
+
+		if raw.BirthYear == nil {
+			birthYear = 2000
+		} else {
+			birthYear = *raw.BirthYear
+		}
+
 		results = append(results, dto.CreateResult{
 			TestID:     raw.TestID,
 			FullName:   raw.FullName,
 			Email:      raw.Email,
 			Org:        raw.Org,
+			BirthYear:  birthYear,
 			Duration:   duration,
 			TotalScore: totalScore,
 			IsOnTime:   isOnTime,

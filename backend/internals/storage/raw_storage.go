@@ -22,15 +22,17 @@ func (r *rawRepo) Create(
 	ctx context.Context,
 	testId uuid.UUID,
 	fn, email, org string,
+	birthYear uint,
 	start time.Time,
 ) (*models.RawSubmission, error) {
 
 	sub := &models.RawSubmission{
-		TestID:   testId,
-		FullName: fn,
-		Email:    email,
-		Org:      org,
-		StartAt:  &start,
+		TestID:    testId,
+		FullName:  fn,
+		Email:     email,
+		Org:       org,
+		BirthYear: &birthYear,
+		StartAt:   &start,
 	}
 
 	if err := r.db.WithContext(ctx).Create(sub).Error; err != nil {

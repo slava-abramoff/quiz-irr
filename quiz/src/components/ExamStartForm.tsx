@@ -1,16 +1,17 @@
 type FormFields = {
-  fullName: string
-  email: string
-  org: string
-}
+  fullName: string;
+  email: string;
+  org: string;
+  birthYear: string;
+};
 
 type ExamStartFormProps = {
-  values: FormFields
-  onChange: (field: keyof FormFields, value: string) => void
-  onSubmit: () => void
-  loading: boolean
-  error: string | null
-}
+  values: FormFields;
+  onChange: (field: keyof FormFields, value: string) => void;
+  onSubmit: () => void;
+  loading: boolean;
+  error: string | null;
+};
 
 export function ExamStartForm({
   values,
@@ -22,14 +23,15 @@ export function ExamStartForm({
   const filled =
     values.fullName.trim().length > 0 &&
     values.email.trim().length > 0 &&
-    values.org.trim().length > 0
+    values.org.trim().length > 0 &&
+    values.birthYear.trim().length > 0;
 
   return (
     <form
       className="exam-form"
       onSubmit={(e) => {
-        e.preventDefault()
-        if (filled && !loading) onSubmit()
+        e.preventDefault();
+        if (filled && !loading) onSubmit();
       }}
     >
       <h2 className="exam-form-title">Данные для начала</h2>
@@ -41,9 +43,29 @@ export function ExamStartForm({
           name="fullName"
           autoComplete="name"
           value={values.fullName}
-          onChange={(e) => onChange('fullName', e.target.value)}
+          onChange={(e) => onChange("fullName", e.target.value)}
           disabled={loading}
         />
+      </label>
+      <label className="exam-field">
+        <span className="exam-field-label">Ваш возраст</span>
+        <select
+          className="exam-input"
+          name="birthYear"
+          value={values.birthYear}
+          onChange={(e) => onChange("birthYear", e.target.value)}
+          disabled={loading}
+        >
+          <option value="" disabled>
+            Выберите год рождения
+          </option>
+          <option value="2008">2008</option>
+          <option value="2009">2009</option>
+          <option value="2010">2010</option>
+          <option value="2011">2011</option>
+          <option value="2012">2012</option>
+          <option value="2013">2013</option>
+        </select>
       </label>
       <label className="exam-field">
         <span className="exam-field-label">Почта</span>
@@ -53,7 +75,7 @@ export function ExamStartForm({
           name="email"
           autoComplete="email"
           value={values.email}
-          onChange={(e) => onChange('email', e.target.value)}
+          onChange={(e) => onChange("email", e.target.value)}
           disabled={loading}
         />
       </label>
@@ -65,7 +87,7 @@ export function ExamStartForm({
           name="org"
           autoComplete="organization"
           value={values.org}
-          onChange={(e) => onChange('org', e.target.value)}
+          onChange={(e) => onChange("org", e.target.value)}
           disabled={loading}
         />
       </label>
@@ -79,8 +101,8 @@ export function ExamStartForm({
         className="quiz-start-btn"
         disabled={!filled || loading}
       >
-        {loading ? 'Отправка…' : 'Старт'}
+        {loading ? "Отправка…" : "Старт"}
       </button>
     </form>
-  )
+  );
 }

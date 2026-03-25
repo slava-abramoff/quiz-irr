@@ -16,6 +16,7 @@ export type ExamStartPayload = {
   full_name: string
   email: string
   org: string
+  birth_year: number
 }
 
 export type ExamStartedResponse = {

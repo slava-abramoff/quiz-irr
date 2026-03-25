@@ -12,9 +12,10 @@ type RawSubmission struct {
 	TestID uuid.UUID `gorm:"type:uuid;not null;index"`
 	Test   Test      `gorm:"foreignKey:TestID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 
-	FullName string `gorm:"type:varchar(255);not null"`
-	Email    string `gorm:"type:varchar(255);not null"`
-	Org      string `gorm:"type:varchar(255)"`
+	FullName  string `gorm:"type:varchar(255);not null"`
+	Email     string `gorm:"type:varchar(255);not null"`
+	Org       string `gorm:"type:varchar(255)"`
+	BirthYear *uint
 
 	AnswersPayload datatypes.JSON `gorm:"type:jsonb"`
 

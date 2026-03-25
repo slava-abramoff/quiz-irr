@@ -22,6 +22,7 @@ type CreateResult struct {
 	FullName   string
 	Email      string
 	Org        string
+	BirthYear  uint
 	Duration   uint
 	TotalScore int
 	IsOnTime   bool
