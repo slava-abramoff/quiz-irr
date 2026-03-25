@@ -6,9 +6,9 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-func ConnectCache(ctx context.Context) (*redis.Client, error) {
+func ConnectCache(ctx context.Context, addr string) (*redis.Client, error) {
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379", // может быть redis:6379
+		Addr:     addr,
 		Password: "",
 		DB:       0,
 	})

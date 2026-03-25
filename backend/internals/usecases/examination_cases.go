@@ -2,12 +2,17 @@ package usecases
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"log"
 	"quiz-irr/internals/handlers/dto"
 	"quiz-irr/internals/storage/models"
 	"quiz-irr/pkg/apperrors"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/redis/go-redis/v9"
 )
 
 type TestInfoProvider interface {
@@ -33,14 +38,16 @@ type examCases struct {
 	optionService   OptionInfoProvider
 	questionService QuestionInfoProvider
 	rawDataService  RawDataServiceProvider
+	cache           *redis.Client
 }
 
-func NewExamCases(t TestInfoProvider, r RawDataServiceProvider, o OptionInfoProvider, q QuestionInfoProvider) *examCases {
+func NewExamCases(t TestInfoProvider, r RawDataServiceProvider, o OptionInfoProvider, q QuestionInfoProvider, cache *redis.Client) *examCases {
 	return &examCases{
 		testService:     t,
 		rawDataService:  r,
 		optionService:   o,
 		questionService: q,
+		cache:           cache,
 	}
 }
 
@@ -76,39 +83,70 @@ func (e *examCases) StartTest(ctx context.Context, id uuid.UUID, data dto.StartE
 		}
 	}
 
-	// TODO: опрашивать кэш
-	questions, err := e.questionService.GetByTestID(ctx, id)
-	if err != nil {
-		return nil, err
+	cacheKey := fmt.Sprintf("exam:test:%s:questions:v1", id.String())
+	var questionDtos []dto.ExamQuestion
+	cacheHit := false
+
+	if e.cache != nil {
+		cached, err := e.cache.Get(ctx, cacheKey).Result()
+		if err == nil {
+			if err := json.Unmarshal([]byte(cached), &questionDtos); err == nil {
+				cacheHit = true
+			}
+		} else if !errors.Is(err, redis.Nil) {
+			// cache error: do not fail the request, just fallback to DB
+		}
 	}
 
-	questionDtos := make([]dto.ExamQuestion, 0, 100)
-
-	for _, q := range questions {
-		questionDto := dto.ExamQuestion{
-			ID:   q.ID,
-			Text: q.Text,
-			Type: q.Type,
+	if cacheHit {
+		log.Println("Cache hit")
+	} else {
+		if e.cache == nil {
+			log.Println("Cache disabled (redis not connected)")
+		} else {
+			log.Println("Cache miss")
 		}
-
-		optionDtos := make([]dto.ExamOption, 0, 10)
-
-		options, err := e.optionService.GetByQuestionID(ctx, q.ID)
+		questions, err := e.questionService.GetByTestID(ctx, id)
 		if err != nil {
 			return nil, err
 		}
 
-		for _, o := range options {
-			optionDto := dto.ExamOption{
-				ID:   o.ID,
-				Text: o.Text,
+		questionDtos = make([]dto.ExamQuestion, 0, len(questions))
+
+		for _, q := range questions {
+			questionDto := dto.ExamQuestion{
+				ID:   q.ID,
+				Text: q.Text,
+				Type: q.Type,
 			}
 
-			optionDtos = append(optionDtos, optionDto)
+			optionDtos := make([]dto.ExamOption, 0, 10)
+
+			options, err := e.optionService.GetByQuestionID(ctx, q.ID)
+			if err != nil {
+				return nil, err
+			}
+
+			for _, o := range options {
+				optionDto := dto.ExamOption{
+					ID:   o.ID,
+					Text: o.Text,
+				}
+
+				optionDtos = append(optionDtos, optionDto)
+			}
+
+			questionDto.Options = optionDtos
+			questionDtos = append(questionDtos, questionDto)
 		}
 
-		questionDto.Options = optionDtos
-		questionDtos = append(questionDtos, questionDto)
+		if e.cache != nil {
+			if b, err := json.Marshal(questionDtos); err == nil {
+				if err := e.cache.Set(ctx, cacheKey, b, 30*time.Minute).Err(); err == nil {
+					log.Println("Cached")
+				}
+			}
+		}
 	}
 
 	startAt := time.Now()

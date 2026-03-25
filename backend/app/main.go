@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
+	"quiz-irr/internals/cache"
 	"quiz-irr/internals/database"
 	"quiz-irr/internals/handlers"
 	"quiz-irr/internals/handlers/dto"
@@ -32,6 +34,7 @@ func main() {
 
 	secret := getenvOrDefault("SECRET", "FDGSSDFGSDFG")
 	port := getenvOrDefault("BACKEND_PORT", ":8080")
+	redisAddr := getenvOrDefault("REDIS_ADDR", "localhost:6379")
 	root := dto.CreateUserRequest{
 		FullName: getenvOrDefault("ADMIN_NAME", "Абрамов Вячеслав Александрович"),
 		Password: getenvOrDefault("ADMIN_PASSWORD", "changeme"),
@@ -41,6 +44,13 @@ func main() {
 	db, err := database.ConnectDB()
 	if err != nil {
 		log.Fatal("Failed connect: " + err.Error())
+	}
+
+	// Connect to redis; if unavailable, app still works without cache.
+	redisClient, err := cache.ConnectCache(context.Background(), redisAddr)
+	if err != nil {
+		log.Println("Redis unavailable, caching disabled:", err)
+		redisClient = nil
 	}
 
 	usersRepo := storage.NewUsersRepo(db)
@@ -61,7 +71,7 @@ func main() {
 
 	testCases := usecases.NewTestsCases(testsService, optionsService, questionsService)
 	userCases := usecases.NewUsersCases(usersService, authService)
-	examCases := usecases.NewExamCases(testsService, rawService, optionsService, questionsService)
+	examCases := usecases.NewExamCases(testsService, rawService, optionsService, questionsService, redisClient)
 	rawAnswersCases := usecases.NewRawAnswersCases(
 		rawService,
 		questionsService,
