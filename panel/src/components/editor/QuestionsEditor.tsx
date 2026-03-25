@@ -32,7 +32,7 @@ export default function QuestionsEditor({
     <section className="rounded-lg border border-gray-200 bg-white p-5 space-y-4">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-sm font-semibold text-gray-900">
-          Вопросы и ответы
+          Вопросы и ответы ({questions.length})
         </h2>
       </div>
 
@@ -42,7 +42,7 @@ export default function QuestionsEditor({
         </p>
       ) : (
         <div className="space-y-4">
-          {questions.map((question) => (
+          {questions.map((question, index) => (
             <div
               key={question.id}
               className="rounded-md border border-gray-200 bg-gray-50/60 p-4 space-y-3"
@@ -50,6 +50,9 @@ export default function QuestionsEditor({
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 space-y-2">
                   <div className="flex items-center gap-2">
+                    <span className="shrink-0 text-xs font-semibold text-gray-700">
+                      {index + 1}.
+                    </span>
                     <input
                       type="text"
                       value={question.text}
