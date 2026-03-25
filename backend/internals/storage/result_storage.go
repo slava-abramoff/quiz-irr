@@ -118,7 +118,9 @@ func (r *resultRepo) GetByTestID(
 	)
 
 	db := r.db.WithContext(ctx).Model(&models.TestResult{}).
-		Where("test_id = ?", testId).Order("total_score DESC")
+		Where("test_id = ?", testId).
+		Order("total_score DESC").
+		Order("duration ASC")
 
 	if err := db.Count(&count).Error; err != nil {
 		return nil, 0, err
