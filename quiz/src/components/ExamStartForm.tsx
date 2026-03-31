@@ -1,5 +1,7 @@
 type FormFields = {
-  fullName: string;
+  lastName: string;
+  firstName: string;
+  patronymic: string;
   email: string;
   org: string;
   birthYear: string;
@@ -21,7 +23,9 @@ export function ExamStartForm({
   error,
 }: ExamStartFormProps) {
   const filled =
-    values.fullName.trim().length > 0 &&
+    values.lastName.trim().length > 0 &&
+    values.firstName.trim().length > 0 &&
+    values.patronymic.trim().length > 0 &&
     values.email.trim().length > 0 &&
     values.org.trim().length > 0 &&
     values.birthYear.trim().length > 0;
@@ -36,14 +40,38 @@ export function ExamStartForm({
     >
       <h2 className="exam-form-title">Данные для начала</h2>
       <label className="exam-field">
-        <span className="exam-field-label">ФИО</span>
+        <span className="exam-field-label">Фамилия</span>
         <input
           className="exam-input"
           type="text"
-          name="fullName"
-          autoComplete="name"
-          value={values.fullName}
-          onChange={(e) => onChange("fullName", e.target.value)}
+          name="lastName"
+          autoComplete="family-name"
+          value={values.lastName}
+          onChange={(e) => onChange("lastName", e.target.value)}
+          disabled={loading}
+        />
+      </label>
+      <label className="exam-field">
+        <span className="exam-field-label">Имя</span>
+        <input
+          className="exam-input"
+          type="text"
+          name="firstName"
+          autoComplete="given-name"
+          value={values.firstName}
+          onChange={(e) => onChange("firstName", e.target.value)}
+          disabled={loading}
+        />
+      </label>
+      <label className="exam-field">
+        <span className="exam-field-label">Отчество</span>
+        <input
+          className="exam-input"
+          type="text"
+          name="patronymic"
+          autoComplete="additional-name"
+          value={values.patronymic}
+          onChange={(e) => onChange("patronymic", e.target.value)}
           disabled={loading}
         />
       </label>

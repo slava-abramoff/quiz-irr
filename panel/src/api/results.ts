@@ -36,4 +36,3 @@ export async function exportResultsExcelByTest(testId: string): Promise<Blob> {
   });
   return data;
 }
-

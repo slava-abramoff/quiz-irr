@@ -24,7 +24,9 @@ type LoadState =
 type Phase = "intro" | "form" | "quiz" | "done";
 
 type StartFormState = {
-  fullName: string;
+  lastName: string;
+  firstName: string;
+  patronymic: string;
   email: string;
   org: string;
   birthYear: string;
@@ -79,7 +81,9 @@ function QuizContent({ testId }: { testId: string }) {
 
   const [phase, setPhase] = useState<Phase>("intro");
   const [startForm, setStartForm] = useState<StartFormState>({
-    fullName: "",
+    lastName: "",
+    firstName: "",
+    patronymic: "",
     email: "",
     org: "",
     birthYear: "",
@@ -146,8 +150,13 @@ function QuizContent({ testId }: { testId: string }) {
     setStartLoading(true);
     setStartError(null);
     try {
+      const fullName = [startForm.lastName, startForm.firstName, startForm.patronymic]
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .join(" ");
+
       const data = await startExam(testId, {
-        full_name: startForm.fullName.trim(),
+        full_name: fullName,
         email: startForm.email.trim(),
         org: startForm.org.trim(),
         birth_year: Number(startForm.birthYear),
